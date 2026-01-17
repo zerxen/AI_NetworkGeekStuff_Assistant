@@ -1,0 +1,11 @@
+# Ignore local config with API keys
+.config.txt
+config.conf
+config.py
+topology_docs/clab-lab_topology
+__pycache__
+chroma_db/chroma.sqlite3
+chroma_db/*
+.venv
+.venv-linux
+__pycache__/*
