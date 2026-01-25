@@ -1,0 +1,9 @@
+{
+  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\Pasted image 20260111143246.png",
+  "description": "The image shows a table listing four virtual machines in a network topology, including two Cisco IOL devices and two Ubuntu VMs. Each entry displays the name, type (cisco_iol or generic_vm), state (running with health status), and assigned IPv4/IPv6 addresses. The layout is structured with columns for Name, Kind/Image, State, and IP Addresses, using a dark background with white text for readability. This table likely represents a lab environment setup, such as a Cisco networking lab or a virtualized testbed.",
+  "generated_at": "2026-01-25T16:53:28.906804Z",
+  "image_mtime": 1768138366.5417187,
+  "model_used": "mistralai/devstral-small-2-2512",
+  "provider": "local",
+  "file_size_bytes": 35058
+}
