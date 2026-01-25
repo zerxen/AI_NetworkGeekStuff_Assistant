@@ -35,7 +35,7 @@ def test_rag(clear_db: bool = False):
         
         print("\n2. Testing document retrieval...")
         test_queries = [
-            "JIRA teams"
+            "proxy"
         ]
         
         for i, query in enumerate(test_queries, 1):

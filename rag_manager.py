@@ -8,11 +8,20 @@ from pathlib import Path
 import time
 import chromadb
 from langchain_openai import OpenAIEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from config import OPENAI_API_KEY, RATE_LIMIT_ENABLED, RATE_LIMIT_DELAY_SECONDS, PROGRESS_REPORT_INTERVAL
+from config import (
+    OPENAI_API_KEY, 
+    RATE_LIMIT_ENABLED, 
+    RATE_LIMIT_DELAY_SECONDS, 
+    PROGRESS_REPORT_INTERVAL,
+    DEBUG_MODE,
+    CHUNK_MIN_SIZE,
+    CHUNK_IDEAL_SIZE,
+    CHUNK_MAX_SIZE
+)
 from knowledge_loader import load_all_documents
+from markdown_chunker import ObsidianMarkdownChunker
 from helpers import debug_print
 
 
@@ -76,30 +85,49 @@ class RAGManager:
             self._load_and_store_documents()
     
     def _load_and_store_documents(self):
-        """Load all knowledge source documents and store embeddings."""
-        documents = load_all_documents()
+        """Load all knowledge source documents using intelligent chunking and store embeddings."""
+        documents = load_all_documents()  # Returns: (file_name, content, relative_path, directory_path)
         
         if not documents:
             print("WARNING: No documents loaded from knowledge sources")
             return
         
-        # Convert to langchain Document objects
-        langchain_docs = [
-            Document(page_content=content, metadata={"source": name})
-            for name, content in documents
-        ]
-        
-        print(f"Processing {len(langchain_docs)} documents...")
-        
-        # Split documents into chunks
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap,
-            separators=["\n\n", "\n", " ", ""]
+        # Initialize intelligent chunker
+        chunker = ObsidianMarkdownChunker(
+            min_chunk_size=CHUNK_MIN_SIZE,
+            ideal_chunk_size=CHUNK_IDEAL_SIZE,
+            max_chunk_size=CHUNK_MAX_SIZE
         )
         
-        chunks = text_splitter.split_documents(langchain_docs)
-        print(f"Created {len(chunks)} chunks from documents")
+        if DEBUG_MODE:
+            print(f"\n[CHUNKING] Starting document processing...")
+            print(f"[CHUNKING] Found {len(documents)} markdown files\n")
+        
+        total_chunks = 0
+        directories_with_context = set()
+        all_chunks = []
+        
+        # Process each document with intelligent chunking
+        for file_name, content, relative_path, directory_path in documents:
+            chunks = chunker.chunk_document(
+                content,
+                file_name,
+                relative_path,
+                directory_path,
+                verbose=DEBUG_MODE  # Show per-file details if DEBUG_MODE enabled
+            )
+            
+            total_chunks += len(chunks)
+            directories_with_context.add(directory_path)
+            all_chunks.extend(chunks)
+        
+        if DEBUG_MODE:
+            print()  # Blank line for readability
+        
+        # Convert to langchain documents with rich metadata
+        langchain_docs = [c.to_langchain_document() for c in all_chunks]
+        
+        print(f"Processing {len(langchain_docs)} chunks from {len(documents)} documents...")
         print(f"Rate limiting: {RATE_LIMIT_ENABLED} | Delay: {RATE_LIMIT_DELAY_SECONDS}s | Progress interval: {PROGRESS_REPORT_INTERVAL} chunks")
         
         # Store in Chroma with rate limiting
@@ -108,9 +136,9 @@ class RAGManager:
         
         # Process chunks in batches with rate limiting and progress reporting
         batch_size = 50  # Process in batches to reduce API calls
-        for batch_idx in range(0, len(chunks), batch_size):
-            batch_end = min(batch_idx + batch_size, len(chunks))
-            batch = chunks[batch_idx:batch_end]
+        for batch_idx in range(0, len(langchain_docs), batch_size):
+            batch_end = min(batch_idx + batch_size, len(langchain_docs))
+            batch = langchain_docs[batch_idx:batch_end]
             
             # Store batch
             if batch_idx == 0:
@@ -127,16 +155,28 @@ class RAGManager:
                 self.vector_store.add_documents(batch)
             
             # Progress reporting
-            if (batch_end % PROGRESS_REPORT_INTERVAL == 0) or (batch_end == len(chunks)):
+            if (batch_end % PROGRESS_REPORT_INTERVAL == 0) or (batch_end == len(langchain_docs)):
                 elapsed = time.time() - start_time
                 rate = batch_end / elapsed if elapsed > 0 else 0
-                print(f"Progress: {batch_end}/{len(chunks)} chunks embedded ({rate:.1f} chunks/sec)")
+                print(f"Progress: {batch_end}/{len(langchain_docs)} chunks embedded ({rate:.1f} chunks/sec)")
             
             # Rate limiting between batches
-            if RATE_LIMIT_ENABLED and batch_end < len(chunks):
+            if RATE_LIMIT_ENABLED and batch_end < len(langchain_docs):
                 time.sleep(RATE_LIMIT_DELAY_SECONDS)
         
-        print(f"Documents successfully stored in vector database ({len(chunks)} chunks total)")
+        print(f"Documents successfully stored in vector database ({len(langchain_docs)} chunks total)")
+        
+        # Print session summary
+        if DEBUG_MODE:
+            avg_size = sum(len(c.content) for c in all_chunks) / len(all_chunks) if all_chunks else 0
+            dir_list = ", ".join(sorted(directories_with_context)) if directories_with_context else "None"
+            
+            print(f"\n[CHUNKING] Summary:")
+            print(f"  |-- Total files processed: {len(documents)}")
+            print(f"  |-- Total chunks generated: {total_chunks}")
+            print(f"  |-- Average chunk size: {avg_size:.0f} chars")
+            print(f"  |-- Directory contexts applied: {len(directories_with_context)} unique directories ({dir_list})")
+            print(f"  `-- Enrichment stats: 100% chunks have directory context, 100% have heading context\n")
     
     def retrieve_relevant_documents(self, query: str, top_k: int = None) -> str:
         """

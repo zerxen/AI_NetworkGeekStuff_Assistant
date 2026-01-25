@@ -15,13 +15,16 @@ def get_knowledge_sources_path() -> Path:
     return Path(KNOWLEDGE_SOURCES_PATH).resolve()
 
 
-def load_all_documents() -> List[Tuple[str, str]]:
+def load_all_documents() -> List[Tuple[str, str, str, str]]:
     """
-    Load all markdown files from knowledge_sources directory.
+    Load all markdown files from knowledge_sources directory recursively with directory context.
+    Scans nested directories at any depth.
     
     Returns:
-        List of tuples: (document_name, document_content)
-        document_name format: "Author/Document_Title"
+        List of tuples: (file_name, document_content, relative_path, directory_path)
+        Examples:
+            ("BGP_Config.md", "# content...", "DXC/Networking/BGP_Config.md", "DXC/Networking")
+            ("OSPF.md", "# content...", "Networking/IGP/OSPF.md", "Networking/IGP")
     """
     documents = []
     knowledge_dir = get_knowledge_sources_path()
@@ -30,25 +33,42 @@ def load_all_documents() -> List[Tuple[str, str]]:
         debug_print(f"WARNING: Knowledge sources directory not found at {knowledge_dir}")
         return documents
     
-    # Walk through all author directories
-    for author_dir in knowledge_dir.iterdir():
-        if not author_dir.is_dir():
-            continue
+    # Walk through all directories recursively
+    for root, dirs, files in os.walk(knowledge_dir):
+        # Get relative path from knowledge_dir
+        current_relative_dir = os.path.relpath(root, knowledge_dir)
         
-        author_name = author_dir.name
+        # Skip the root directory itself
+        if current_relative_dir == ".":
+            current_relative_dir = ""
         
-        # Find all markdown files in author directory
-        for md_file in author_dir.glob("*.md"):
+        # Find all markdown files in this directory
+        for file in files:
+            if not file.endswith(".md"):
+                continue
+            
+            file_path = os.path.join(root, file)
+            
             try:
-                with open(md_file, "r", encoding="utf-8") as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                 
                 if content.strip():  # Only add non-empty documents
-                    doc_name = f"{author_name}/{md_file.stem}"
-                    documents.append((doc_name, content))
-                    debug_print(f"Loaded: {doc_name} ({len(content)} characters)")
+                    file_name = file
+                    
+                    # Build relative path: "Networking/BGP/BGP_Config.md"
+                    if current_relative_dir:
+                        relative_path = os.path.join(current_relative_dir, file_name).replace("\\", "/")
+                    else:
+                        relative_path = file_name
+                    
+                    # Directory path: "Networking/BGP"
+                    directory_path = current_relative_dir.replace("\\", "/") if current_relative_dir else "root"
+                    
+                    documents.append((file_name, content, relative_path, directory_path))
+                    debug_print(f"Loaded: {relative_path} ({len(content)} characters)")
             except Exception as e:
-                debug_print(f"ERROR loading {md_file}: {e}")
+                debug_print(f"ERROR loading {file_path}: {e}")
     
     debug_print(f"Total documents loaded: {len(documents)}")
     return documents

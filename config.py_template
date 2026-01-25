@@ -7,4 +7,9 @@ MODEL="gpt-5-mini"
 MAX_TOKEN_COMPLETITION=2000
 CONFIG_PATH = "config.py"
 DEBUG_MODE = False  # Set to False to disable all debug prints
-KNOWLEDGE_SOURCES_PATH = "./knowledge_souces"  # Path to knowledge sources directory (default has typo in folder name)
+KNOWLEDGE_SOURCES_PATH = "./knowledge_sources" 
+
+# Intelligent Markdown Chunking Configuration
+CHUNK_MIN_SIZE = 500  # Minimum chunk size in characters (content must be meaningful)
+CHUNK_IDEAL_SIZE = 3000  # Ideal chunk size in characters (target for smart sizing)
+CHUNK_MAX_SIZE = 8000  # Maximum chunk size in characters (hard limit)
