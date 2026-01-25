@@ -2,7 +2,7 @@ import json
 import time
 from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, retrieveKnowledge, tools_definition
 from helpers import debug_print
-from openai_client import chat_completion
+from llm_client import chat_completion
 
 
 def parse_arguments(arguments_raw):
@@ -137,7 +137,7 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                 assistant_msg = {"role": "assistant"}
                 if follow.choices[0].message.content:
                     assistant_msg["content"] = follow.choices[0].message.content.strip()
-                    print("\nChatGPT (after tools):", assistant_msg["content"])
+                    print("\nLLM (after tools):", assistant_msg["content"])
                 
                 # Check if the follow-up response contains tool_calls
                 follow_tool_calls = getattr(follow.choices[0].message, "tool_calls", None)

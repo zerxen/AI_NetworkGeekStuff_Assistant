@@ -1,12 +1,12 @@
 
 #!/usr/bin/env python3
 """
-Simple interactive ChatGPT CLI example using the `openai` Python library.
+Simple interactive LLM CLI example using the `openai` Python library.
 
 Usage:
 1. Put your API key in `config.py` as:
    OPENAI_API_KEY="sk-...your key..."
-2. Run: `python chatgpt_cli.py`
+2. Run: `python main.py`
 
 This script reads the key from `.config.txt`, keeps a short conversation
 history, and sends messages to the Chat Completions API.
@@ -18,7 +18,7 @@ from config import MAX_TOKEN_COMPLETITION
 from tools_processing import process_tool_calls
 from helpers import debug_print
 from rag_manager import get_rag_manager
-from openai_client import chat_completion
+from llm_client import chat_completion
 
 def main():
 
@@ -52,7 +52,7 @@ def main():
     # message with role `tool` so the assistant can continue.
 
 
-    print("Interactive ChatGPT CLI (type 'exit' or Ctrl-C to quit)")
+    print("Interactive LLM CLI (type 'exit' or Ctrl-C to quit)")
 
     while True:
         try:
@@ -112,7 +112,7 @@ def main():
             # Adding what we recieved to context log:
             messages.append(context)
                          
-            print("\nChatGPT:", assistant_text)
+            print("\nLLM:", assistant_text)
             print("Tokens used: ")
             try:
                 print(" - completion_tokens: ", resp.usage.completion_tokens)

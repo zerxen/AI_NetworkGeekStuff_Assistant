@@ -6,6 +6,7 @@ topology_docs/clab-lab_topology
 __pycache__
 chroma_db/chroma.sqlite3
 chroma_db/*
+chroma_db_local/*
 .venv
 .venv-linux
 __pycache__/*
