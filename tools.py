@@ -74,13 +74,13 @@ tools_definition = [
         "type": "function",
         "function": {
             "name": "retrieveKnowledge",
-            "description": "Retrieve relevant knowledge documents and network information from the knowledge base. Use this when you need to look up specific networking topics, configurations, or topology details.",
+            "description": "Retrieve relevant knowledge documents for the query from local RAG vector database containing local information. Use this when you need to look up specific to the user's company documentation, lab notes, or other technical notes the user is keeping.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "The search query to find relevant knowledge (e.g., 'BGP configuration', 'OSPF troubleshooting')"
+                        "description": "The search query to find relevant knowledge (e.g., 'LAB configuration notes', 'list of JIRA teams' or 'company contacts for procurment')"
                     },
                     "top_k": {
                         "type": "integer",

@@ -1,8 +1,8 @@
 import json
 import time
 from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, retrieveKnowledge, tools_definition
-from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY
 from helpers import debug_print
+from openai_client import chat_completion
 
 
 def parse_arguments(arguments_raw):
@@ -26,7 +26,7 @@ def parse_arguments(arguments_raw):
     return {}
 
 
-def process_tool_calls(resp, messages, tools, model, max_completion_tokens=1024):
+def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
     """
     Process `tool_calls` (array) 
     """
@@ -126,12 +126,10 @@ def process_tool_calls(resp, messages, tools, model, max_completion_tokens=1024)
 
             # Request a follow-up now that all tools executed
             try:
-                follow = openai.chat.completions.create(
-                    model=model,
+                follow = chat_completion(
                     messages=messages,
-                    max_completion_tokens=max_completion_tokens,
                     tools=tools,
-                    tool_choice="auto",
+                    max_tokens=max_completion_tokens,
                 )
                 debug_print("DEBUG of what we recieved from GPT (follow-up): ", follow)
                 
@@ -156,7 +154,7 @@ def process_tool_calls(resp, messages, tools, model, max_completion_tokens=1024)
                 # If follow-up contains tool calls, process them recursively
                 if follow_tool_calls:
                     print("Follow-up response contains tool_calls, processing recursively...")
-                    messages, tool_processed = process_tool_calls(follow, messages, tools, model, max_completion_tokens)
+                    messages, tool_processed = process_tool_calls(follow, messages, tools, max_completion_tokens)
                     return messages, tool_processed
                     
             except Exception as e:

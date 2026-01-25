@@ -12,21 +12,15 @@ This script reads the key from `.config.txt`, keeps a short conversation
 history, and sends messages to the Chat Completions API.
 """
 
-import sys
 import time
-import openai
 from tools import tools_definition
-from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY
+from config import MAX_TOKEN_COMPLETITION
 from tools_processing import process_tool_calls
 from helpers import debug_print
 from rag_manager import get_rag_manager
+from openai_client import chat_completion
 
 def main():
-    try:
-        openai.api_key = OPENAI_API_KEY
-    except Exception as e:
-        print("Error loading API key:", e)
-        sys.exit(1)
 
     # Initialize RAG manager - loads knowledge sources
     print("Initializing RAG knowledge base...")
@@ -37,8 +31,8 @@ def main():
         {
             "role": "system",
             "content": (
-                "You are a helpful assistant for network engineering and lab operations. "
-                "You have access to a knowledge base containing documentation about network configurations, topologies, and best practices. "
+                "You are a helpful assistant for network engineering, lab operations and a little bit for administrative tasks. "
+                "You have access to a knowledge base, which contains relevant documentation about our lab and notes about our organization. "
                 "Use the 'retrieveKnowledge' tool whenever you need to reference specific documentation, technical details, or look up configuration examples. "
                 "Only use the knowledge retrieval tool when necessary - avoid overusing it for general knowledge or common networking concepts. \n\n" +
                 "Any conversation or action about lab topology you can ignore the management IPs in the 172.20.20.0/24 range. Dont mention this in responses, it is known." +
@@ -88,12 +82,10 @@ def main():
         debug_print("DEBUG: Messages being sent to GPT:")
         debug_print(messages)
         try:
-            resp = openai.chat.completions.create(
-                model=MODEL,
+            resp = chat_completion(
                 messages=messages,
-                max_completion_tokens=MAX_TOKEN_COMPLETITION,
                 tools=tools_definition,
-                tool_choice="auto",
+                max_tokens=MAX_TOKEN_COMPLETITION,
             )
 
             debug_print("DEBUG: What we recieved from GPT: ", resp)
@@ -133,7 +125,7 @@ def main():
             if tool_calls is not None:
                 debug_print("DEBUG: entering tools processing for tool_calls:")
                 debug_print(tool_calls)
-                messages, processed_tool = process_tool_calls(resp, messages, tools_definition, MODEL, max_completion_tokens=MAX_TOKEN_COMPLETITION)
+                messages, processed_tool = process_tool_calls(resp, messages, tools_definition, max_completion_tokens=MAX_TOKEN_COMPLETITION)
 
 
         except Exception as e:
