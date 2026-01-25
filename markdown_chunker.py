@@ -9,6 +9,8 @@ from typing import List, Dict, Tuple, Optional
 from pathlib import Path
 import frontmatter
 from helpers import debug_print
+from image_resolver import ImageResolver
+from config import KNOWLEDGE_SOURCES_PATH
 
 
 @dataclass
@@ -84,7 +86,46 @@ class ObsidianMarkdownChunker:
         self.min_chunk_size = min_chunk_size
         self.ideal_chunk_size = ideal_chunk_size
         self.max_chunk_size = max_chunk_size
-    
+
+    def _inject_image_descriptions(self, content: str, markdown_path: Path) -> str:
+        """
+        Find image links in content and inject their descriptions.
+
+        Args:
+            content: Markdown content to process
+            markdown_path: Path to the markdown file (for resolving relative paths)
+
+        Returns:
+            Content with image descriptions injected after image links
+        """
+        resolver = ImageResolver()
+        links = resolver.find_image_links(content)
+
+        if not links:
+            return content
+
+        result = content
+
+        for full_match, image_ref in links:
+            # Resolve image path
+            image_path = resolver.resolve_image_path(image_ref, markdown_path)
+
+            if image_path is None:
+                # Image not found
+                injection = f"\n[IMAGE NOT FOUND: {image_ref}]"
+            else:
+                # Try to get description
+                description = resolver.get_image_description(image_path)
+                if description:
+                    injection = f"\n[IMAGE: {image_ref} - {description}]"
+                else:
+                    injection = f"\n[IMAGE NOT PROCESSED: {image_ref} - Run preprocess_images.py to generate description]"
+
+            # Insert description after the image link
+            result = result.replace(full_match, full_match + injection, 1)
+
+        return result
+
     def chunk_document(
         self,
         content: str,
@@ -116,7 +157,11 @@ class ObsidianMarkdownChunker:
         except Exception as e:
             debug_print(f"WARNING: Could not parse frontmatter for {file_name}: {e}")
             main_content = content
-        
+
+        # Inject image descriptions before chunking
+        markdown_path = Path(KNOWLEDGE_SOURCES_PATH) / relative_path
+        main_content = self._inject_image_descriptions(main_content, markdown_path)
+
         # Extract heading structure
         heading_blocks = self._parse_headings(main_content)
         

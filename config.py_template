@@ -102,6 +102,46 @@ CHUNK_MAX_SIZE = 8000   # Maximum chunk size in characters
 
 
 # =============================================================================
+# Image Processing / Vision Configuration
+# =============================================================================
+# Vision provider for image-to-text preprocessing
+# Options: "openai" (GPT-4o) or "local" (LM Studio)
+# SECURITY: Set to "local" to ensure no image data is sent to OpenAI
+VISION_PROVIDER = os.getenv("VISION_PROVIDER", "local")
+
+# OpenAI Vision Settings (used when VISION_PROVIDER="openai")
+OPENAI_VISION_MODEL = "gpt-4o-mini"
+
+# Local Vision Settings (used when VISION_PROVIDER="local")
+# Uses same endpoint as LLM_PROVIDER. Requires a vision-capable model.
+# Common models: LLaVA, devstral-small (with vision support)
+LOCAL_VISION_MODEL = os.getenv("LOCAL_VISION_MODEL", "mistralai/devstral-small-2-2512")
+
+# Image processing settings
+IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"]
+IMAGE_MAX_SIZE_MB = 20  # Skip images larger than this
+IMAGE_DESCRIPTION_MAX_TOKENS = 500
+
+
+def get_vision_config():
+    """Returns the active vision configuration for image processing."""
+    if VISION_PROVIDER == "local":
+        return {
+            "provider": "local",
+            "base_url": LOCAL_BASE_URL,
+            "api_key": LOCAL_API_KEY,
+            "model": LOCAL_VISION_MODEL,
+        }
+    else:
+        return {
+            "provider": "openai",
+            "base_url": OPENAI_BASE_URL,
+            "api_key": OPENAI_API_KEY,
+            "model": OPENAI_VISION_MODEL,
+        }
+
+
+# =============================================================================
 # Rate Limiting Configuration
 # =============================================================================
 RATE_LIMIT_ENABLED = True
