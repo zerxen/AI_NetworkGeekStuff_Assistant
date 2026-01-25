@@ -35,7 +35,7 @@ def test_rag(clear_db: bool = False):
         
         print("\n2. Testing document retrieval...")
         test_queries = [
-            "proxy"
+            "cisco lab credentials"
         ]
         
         for i, query in enumerate(test_queries, 1):
