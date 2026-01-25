@@ -7,12 +7,12 @@ import os
 from pathlib import Path
 from typing import List, Tuple
 from helpers import debug_print
+from config import KNOWLEDGE_SOURCES_PATH
 
 
 def get_knowledge_sources_path() -> Path:
-    """Get the knowledge_sources directory path."""
-    base_dir = Path(__file__).parent
-    return base_dir / "knowledge_souces"  # Note: folder name has typo "souces"
+    """Get the knowledge_sources directory path from configuration."""
+    return Path(KNOWLEDGE_SOURCES_PATH).resolve()
 
 
 def load_all_documents() -> List[Tuple[str, str]]:

@@ -35,7 +35,7 @@ def test_rag(clear_db: bool = False):
         
         print("\n2. Testing document retrieval...")
         test_queries = [
-            "Peter Havrila and time traveling"
+            "JIRA teams"
         ]
         
         for i, query in enumerate(test_queries, 1):
@@ -63,5 +63,5 @@ def test_rag(clear_db: bool = False):
 
 
 if __name__ == "__main__":
-    success = test_rag()
+    success = test_rag(True)
     sys.exit(0 if success else 1)

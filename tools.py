@@ -12,7 +12,7 @@ import re
 from netmiko import ConnectHandler
 from helpers import debug_print
 
-__all__ = ["getCurrentDateAndTime", "getTopologyInformation", "getDeviceConfiguration", "executeCommandsOnDevice"]
+__all__ = ["getCurrentDateAndTime", "getTopologyInformation", "getDeviceConfiguration", "executeCommandsOnDevice", "retrieveKnowledge"]
 
 # Declare available tools (ensure this is in-scope for the chat calls)
 tools_definition = [
@@ -67,6 +67,27 @@ tools_definition = [
                     "expected_string": {"type": "string", "description": "Optional regex/string that describes the expected prompt/string after command execution (used as an expect_string)"}
                 },
                 "required": ["target", "commands"]
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "retrieveKnowledge",
+            "description": "Retrieve relevant knowledge documents and network information from the knowledge base. Use this when you need to look up specific networking topics, configurations, or topology details.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query to find relevant knowledge (e.g., 'BGP configuration', 'OSPF troubleshooting')"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "description": "Number of top relevant documents to retrieve (default: 5, range: 1-10)"
+                    }
+                },
+                "required": ["query"]
             },
         },
     }
@@ -424,5 +445,31 @@ def executeCommandsOnDevice(target: str, commands: str, expected_string: str = N
 
     except Exception as e:
         error_msg = f"Error executing commands on device: {str(e)}"
+        print(f"Error: {error_msg}")
+        return json.dumps({"error": error_msg})
+
+
+def retrieveKnowledge(query: str, top_k: int = 5) -> str:
+    """Retrieve relevant knowledge from the vector database.
+    
+    Args:
+        query: The query/context to search knowledge base for
+        top_k: Number of top results to return (default: 5, max: 10)
+        
+    Returns:
+        Formatted string with relevant document excerpts
+    """
+    print(f"Tool executed called: retrieveKnowledge with query='{query}' top_k={top_k}")
+    
+    # Clamp top_k to reasonable range
+    top_k = max(1, min(top_k, 10))
+    
+    try:
+        from rag_manager import retrieve_context
+        result = retrieve_context(query, top_k=top_k)
+        debug_print(f"DEBUG: Knowledge retrieval result: {result}")
+        return result
+    except Exception as e:
+        error_msg = f"Error retrieving knowledge: {str(e)}"
         print(f"Error: {error_msg}")
         return json.dumps({"error": error_msg})

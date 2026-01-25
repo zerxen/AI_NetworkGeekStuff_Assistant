@@ -7,3 +7,4 @@ MODEL="gpt-5-mini"
 MAX_TOKEN_COMPLETITION=2000
 CONFIG_PATH = "config.py"
 DEBUG_MODE = False  # Set to False to disable all debug prints
+KNOWLEDGE_SOURCES_PATH = "./knowledge_souces"  # Path to knowledge sources directory (default has typo in folder name)

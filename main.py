@@ -16,10 +16,10 @@ import sys
 import time
 import openai
 from tools import tools_definition
-from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY, TOP_K_DOCUMENTS
+from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY
 from tools_processing import process_tool_calls
 from helpers import debug_print
-from rag_manager import get_rag_manager, retrieve_context
+from rag_manager import get_rag_manager
 
 def main():
     try:
@@ -37,7 +37,10 @@ def main():
         {
             "role": "system",
             "content": (
-                "You are a helpful assistant. " +
+                "You are a helpful assistant for network engineering and lab operations. "
+                "You have access to a knowledge base containing documentation about network configurations, topologies, and best practices. "
+                "Use the 'retrieveKnowledge' tool whenever you need to reference specific documentation, technical details, or look up configuration examples. "
+                "Only use the knowledge retrieval tool when necessary - avoid overusing it for general knowledge or common networking concepts. \n\n" +
                 "Any conversation or action about lab topology you can ignore the management IPs in the 172.20.20.0/24 range. Dont mention this in responses, it is known." +
                 "During configuration tasks ignore interfaces with IPs in this range, but do not break them as they serve as access for all tools. Dont mention this in responses, it is known." +
                 "Also ignore enp1s0 interfaces on linux devices and ethernet 0/0 on cisco devices as these are management addresses behind a NAT of their management 172.20.20.x IPs. Dont mention this in responses, it is known." +
@@ -78,25 +81,6 @@ def main():
             continue
 
         messages.append({"role": "user", "content": prompt})
-
-        #----------
-        # Retrieve relevant knowledge context using RAG
-        #---------
-        context_docs = retrieve_context(prompt, top_k=TOP_K_DOCUMENTS)
-        
-        # Create an augmented user message with relevant context
-        augmented_user_msg = {
-            "role": "user",
-            "content": (
-                f"{context_docs}\n\n"
-                f"Based on the above knowledge, please help with: {prompt}"
-            )
-        }
-        
-        # Replace the last user message with augmented version
-        print("Retrieving relevant knowledge... ")
-        print(augmented_user_msg)
-        messages[-1] = augmented_user_msg
 
         #----------
         # Communication with GPT

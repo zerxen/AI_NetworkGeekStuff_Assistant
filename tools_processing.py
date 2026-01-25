@@ -1,6 +1,6 @@
 import json
 import time
-from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, tools_definition
+from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, retrieveKnowledge, tools_definition
 from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY
 from helpers import debug_print
 
@@ -102,6 +102,19 @@ def process_tool_calls(resp, messages, tools, model, max_completion_tokens=1024)
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
+                elif name == "retrieveKnowledge":
+                    debug_print("DEBUG: Entering tool: retrieveKnowledge")
+                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
+                    arguments_object = parse_arguments(arguments_raw)
+                    query = arguments_object.get("query", "")
+                    top_k = arguments_object.get("top_k", 5)
+                    debug_print("DEBUG: query =", query)
+                    debug_print("DEBUG: top_k =", top_k)
+                    try:
+                        tool_result = retrieveKnowledge(query, top_k)
+                        debug_print("DEBUG: Tool result =", tool_result)
+                    except Exception as e:
+                        tool_result = f"Error retrieving knowledge: {e}"
                 else:
                     tool_result = f"Unknown tool: {name}"
 
