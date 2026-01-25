@@ -1,6 +1,5 @@
 import json
 import time
-import openai
 from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, tools_definition
 from config import MODEL, MAX_TOKEN_COMPLETITION, CONFIG_PATH, OPENAI_API_KEY
 from helpers import debug_print
