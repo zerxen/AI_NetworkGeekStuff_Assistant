@@ -144,10 +144,11 @@ class ImagePreprocessor:
         prompt = f"""Describe this image in detail for a knowledge base search system.
 Focus on:
 - What the image shows (diagrams, screenshots, network topologies, photos, etc.)
-- Any text visible in the image
+- All text visible in the image
 - Technical details if it's a network/system diagram
 - Key elements and their relationships
-- Colors, layout, and structure if relevant
+- If you notice any errors or anomalies in the image, like bad network topology, misconfigurations, write that down.
+- All IP addresses, hostnames, labels, and annotations visible in the image. Especially IP addresses associated with devices.
 
 Image filename: {image_path.name}
 

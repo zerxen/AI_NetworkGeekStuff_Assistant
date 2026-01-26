@@ -29,47 +29,47 @@ tools_definition = [
             },
         },
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "getTopologyInformation",
-            "description": "Read and return the network topology information from the topology.clab.yaml file converted to JSON format",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "getDeviceConfiguration",
-            "description": "Retrieve the running configuration or network information from a target device via SSH",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "target": {"type": "string", "description": "The target device name (e.g., 'cisco1', 'ubuntu1')"}
-                },
-                "required": ["target"]
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "executeCommandsOnDevice",
-            "description": "Execute arbitrary commands on a target device via SSH after user approval",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "target": {"type": "string", "description": "The target device name (e.g., 'cisco1', 'ubuntu1')"},
-                    "commands": {"type": "string", "description": "Commands to execute on the target; newline-separated or semicolon-separated"},
-                    "expected_string": {"type": "string", "description": "Optional regex/string that describes the expected prompt/string after command execution (used as an expect_string)"}
-                },
-                "required": ["target", "commands"]
-            },
-        },
-    },
+    #{
+    #    "type": "function",
+    #    "function": {
+    #        "name": "getTopologyInformation",
+    #        "description": "Read and return the network topology information from the topology.clab.yaml file converted to JSON format",
+    #        "parameters": {
+    #            "type": "object",
+    #            "properties": {},
+    #        },
+    #    },
+    #},
+    #{
+    #    "type": "function",
+    #    "function": {
+    #        "name": "getDeviceConfiguration",
+    #        "description": "Retrieve the running configuration or network information from a target device via SSH",
+    #        "parameters": {
+    #            "type": "object",
+    #            "properties": {
+    #                "target": {"type": "string", "description": "The target device name (e.g., 'cisco1', 'ubuntu1')"}
+    #            },
+    #            "required": ["target"]
+    #        },
+    #    },
+    #},
+    #{
+    #    "type": "function",
+    #    "function": {
+    #        "name": "executeCommandsOnDevice",
+    #        "description": "Execute arbitrary commands on a target device via SSH after user approval",
+    #        "parameters": {
+    #            "type": "object",
+    #            "properties": {
+    #                "target": {"type": "string", "description": "The target device name (e.g., 'cisco1', 'ubuntu1')"},
+    #                "commands": {"type": "string", "description": "Commands to execute on the target; newline-separated or semicolon-separated"},
+    #                "expected_string": {"type": "string", "description": "Optional regex/string that describes the expected prompt/string after command execution (used as an expect_string)"}
+    #            },
+    #            "required": ["target", "commands"]
+    #        },
+    #    },
+    #},
     {
         "type": "function",
         "function": {
