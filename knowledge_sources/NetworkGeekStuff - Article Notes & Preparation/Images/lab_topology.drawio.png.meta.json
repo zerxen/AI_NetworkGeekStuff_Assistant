@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio.png",
-  "description": "The image is a network topology diagram showing four devices connected in sequence: an Ubuntu server (ubuntu1), two Cisco routers (cisco1 and cisco2), and another Ubuntu server (ubuntu2). Each device is labeled with its hostname, IP address, and subnet mask. The connections between the devices are represented by lines, indicating the flow of data through the network. The diagram uses a simple layout with icons for servers and routers, and text labels for IP addresses and hostnames.",
-  "generated_at": "2026-01-25T16:53:20.960592Z",
-  "image_mtime": 1767977101.0,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 26791
-}

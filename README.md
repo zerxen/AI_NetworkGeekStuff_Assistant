@@ -95,9 +95,9 @@ The assistant has access to these tools (defined in `tools.py`):
 | Tool | Description |
 |------|-------------|
 | `getCurrentDateAndTime` | Returns current date/time with custom strftime format |
-| `getTopologyInformation` | Reads network topology from ContainerLab YAML files |
-| `getDeviceConfiguration` | Retrieves running config from Cisco devices or network info from Linux VMs via SSH |
-| `executeCommandsOnDevice` | Executes arbitrary commands on devices via SSH (requires human approval) |
+| `getContainerLabTopologyInformation` | Reads network topology from ContainerLab YAML files |
+| `getContainerLabDeviceConfiguration` | Retrieves running config from Cisco devices or network info from Linux VMs via SSH |
+| `executeCommandsOnContainerLabDevice` | Executes arbitrary commands on devices via SSH (requires human approval) |
 | `retrieveKnowledge` | Searches the RAG knowledge base for relevant documentation |
 
 ---
@@ -179,14 +179,14 @@ Tool executed called: getCurrentDateAndTime with fmt = %Y-%m-%d %H:%M:%S
 LLM: The current time is 2026-01-25 14:32:15.
 
 You: What devices are in the lab topology?
-Tool executed called: getTopologyInformation
+Tool executed called: getContainerLabTopologyInformation
 
 LLM: The lab topology contains:
 - cisco1, cisco2, cisco3 (Cisco IOL routers)
 - ubuntu1, ubuntu2 (Linux VMs)
 
 You: Show me the running config of cisco1
-Tool executed called: getDeviceConfiguration with target = cisco1
+Tool executed called: getContainerLabDeviceConfiguration with target = cisco1
 Connecting to Cisco device at 172.20.20.11...
 
 LLM: Here is the running configuration of cisco1:

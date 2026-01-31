@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio 2.png",
-  "description": "This image is a network topology diagram showing the connection between two Ubuntu servers (ubuntu1 and ubuntu2) and two Cisco switches (cisco1 and cisco2). The diagram illustrates the IP addressing scheme, with ubuntu1 connected to cisco1 via interface E0/2, and ubuntu2 connected to cisco2 via interface E0/2. Additionally, cisco1 is connected to cisco2 through interfaces E0/1 on both switches. The diagram also shows the out-of-band (OOB) management interfaces for each device, with their respective IP addresses and subnet masks.",
-  "generated_at": "2026-01-25T16:53:13.883174Z",
-  "image_mtime": 1768138004.1850672,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 36911
-}

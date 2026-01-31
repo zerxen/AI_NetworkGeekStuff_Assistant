@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\thumbnail.png",
-  "description": "The image shows a conceptual diagram illustrating the flow of data or processes in a technical system. It features three key elements arranged sequentially from left to right:\n\n1. A stylized logo resembling interconnected nodes, possibly representing an AI model or neural network.\n2. A terminal window with a command-line interface, indicating interaction or processing via commands.\n3. A cylindrical database symbol with green stripes, suggesting data storage or retrieval.\n\nThe background includes abstract network-like patterns in blue and purple hues, emphasizing connectivity and technology. The layout implies a workflow where the AI model interacts with the terminal to access or manipulate data stored in the database. This image would be relevant for topics related to AI integration, command-line operations, or database management systems.",
-  "generated_at": "2026-01-25T16:53:43.132014Z",
-  "image_mtime": 1769342252.9654355,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 2195059
-}

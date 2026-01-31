@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio 1.png",
-  "description": "This image is a network topology diagram showing the connection between two Ubuntu servers (ubuntu1 and ubuntu2) via two Cisco routers (cisco1 and cisco2). The diagram illustrates the IP addressing scheme, with ubuntu1 connected to cisco1 via interface E0/2 (IP 10.10.10.1), cisco1 connected to cisco2 via interface E0/1 (IP 20.20.20.1 and 20.20.20.2), and ubuntu2 connected to cisco2 via interface E0/2 (IP 30.30.30.2). The layout is linear, with servers on the ends and routers in the middle, using a color scheme of dark gray for servers and blue for routers.",
-  "generated_at": "2026-01-25T16:53:05.616746Z",
-  "image_mtime": 1768116816.0,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 32621
-}
