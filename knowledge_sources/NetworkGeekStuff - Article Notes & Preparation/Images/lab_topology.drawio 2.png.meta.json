@@ -1,0 +1,9 @@
+{
+  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio 2.png",
+  "description": "This image depicts a network topology diagram featuring two Ubuntu servers (`ubuntu1` and `ubuntu2`) connected to two Cisco switches (`cisco1` and `cisco2`). The Ubuntu hosts have interfaces labeled `ens2 (eth1)` with IP addresses `10.10.10.1/24` and `30.30.30.1/24`, respectively, while the Cisco switches use interfaces `E0/2` and `E0/1` for connectivity. The diagram shows a linear connection flow: `ubuntu1` \u2192 `cisco1` (E0/2) \u2192 `cisco2` (E0/1) \u2192 `ubuntu2`. All devices are labeled with their hostnames, interface names, and IP addresses. No errors or anomalies are visible in the topology.\n\n**Search keywords for retrieval:**\n- Network topology diagram\n- Cisco switch configuration\n- Ubuntu server networking\n- Layer 2 connectivity\n- IP addressing (10.10.10.x/24, 30.30.30.x/24)\n- Draw.io network diagram",
+  "generated_at": "2026-01-31T19:27:52.711159Z",
+  "image_mtime": 1768138004.1850672,
+  "model_used": "mistralai/devstral-small-2-2512",
+  "provider": "local",
+  "file_size_bytes": 36911
+}

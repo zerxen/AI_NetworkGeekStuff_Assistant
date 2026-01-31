@@ -1,8 +1,8 @@
 import json
 import time
-from tools import getCurrentDateAndTime, getTopologyInformation, getDeviceConfiguration, executeCommandsOnDevice, retrieveKnowledge, tools_definition
+from tools import getCurrentDateAndTime, getContainerLabTopologyInformation, getContainerLabDeviceConfiguration, executeCommandsOnContainerLabDevice, retrieveKnowledge, searchKnowledgeFiles, readKnowledgeFile, tools_definition
 from helpers import debug_print
-from openai_client import chat_completion
+from llm_client import chat_completion
 
 
 def parse_arguments(arguments_raw):
@@ -70,26 +70,26 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
-                elif name == "getTopologyInformation":
-                    debug_print("DEBUG: Entering tool: getTopologyInformation")
+                elif name == "getContainerLabTopologyInformation":
+                    debug_print("DEBUG: Entering tool: getContainerLabTopologyInformation")
                     try:
-                        tool_result = getTopologyInformation()
+                        tool_result = getContainerLabTopologyInformation()
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
-                elif name == "getDeviceConfiguration":
-                    debug_print("DEBUG: Entering tool: getDeviceConfiguration")
+                elif name == "getContainerLabDeviceConfiguration":
+                    debug_print("DEBUG: Entering tool: getContainerLabDeviceConfiguration")
                     arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
                     arguments_object = parse_arguments(arguments_raw)
                     target = arguments_object.get("target", None)
                     debug_print("DEBUG: target =", target)
                     try:
-                        tool_result = getDeviceConfiguration(target)
+                        tool_result = getContainerLabDeviceConfiguration(target)
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
-                elif name == "executeCommandsOnDevice":
-                    debug_print("DEBUG: Entering tool: executeCommandsOnDevice")
+                elif name == "executeCommandsOnContainerLabDevice":
+                    debug_print("DEBUG: Entering tool: executeCommandsOnContainerLabDevice")
                     arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
                     arguments_object = parse_arguments(arguments_raw)
                     target = arguments_object.get("target", None)
@@ -98,7 +98,7 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                     debug_print("DEBUG: target =", target)
                     debug_print("DEBUG: commands =", commands)
                     try:
-                        tool_result = executeCommandsOnDevice(target, commands, expected_string)
+                        tool_result = executeCommandsOnContainerLabDevice(target, commands, expected_string)
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
@@ -115,6 +115,28 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error retrieving knowledge: {e}"
+                elif name == "searchKnowledgeFiles":
+                    debug_print("DEBUG: Entering tool: searchKnowledgeFiles")
+                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
+                    arguments_object = parse_arguments(arguments_raw)
+                    keyword = arguments_object.get("keyword", "")
+                    debug_print("DEBUG: keyword =", keyword)
+                    try:
+                        tool_result = searchKnowledgeFiles(keyword)
+                        debug_print("DEBUG: Tool result =", tool_result)
+                    except Exception as e:
+                        tool_result = f"Error searching knowledge files: {e}"
+                elif name == "readKnowledgeFile":
+                    debug_print("DEBUG: Entering tool: readKnowledgeFile")
+                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
+                    arguments_object = parse_arguments(arguments_raw)
+                    file_path = arguments_object.get("file_path", "")
+                    debug_print("DEBUG: file_path =", file_path)
+                    try:
+                        tool_result = readKnowledgeFile(file_path)
+                        debug_print("DEBUG: Tool result =", tool_result)
+                    except Exception as e:
+                        tool_result = f"Error reading knowledge file: {e}"
                 else:
                     tool_result = f"Unknown tool: {name}"
 
@@ -137,7 +159,7 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                 assistant_msg = {"role": "assistant"}
                 if follow.choices[0].message.content:
                     assistant_msg["content"] = follow.choices[0].message.content.strip()
-                    print("\nChatGPT (after tools):", assistant_msg["content"])
+                    print("\nLLM (after tools):", assistant_msg["content"])
                 
                 # Check if the follow-up response contains tool_calls
                 follow_tool_calls = getattr(follow.choices[0].message, "tool_calls", None)

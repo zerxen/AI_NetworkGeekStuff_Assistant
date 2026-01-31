@@ -12,7 +12,7 @@ import re
 from netmiko import ConnectHandler
 from helpers import debug_print
 
-__all__ = ["getCurrentDateAndTime", "getTopologyInformation", "getDeviceConfiguration", "executeCommandsOnDevice", "retrieveKnowledge"]
+__all__ = ["getCurrentDateAndTime", "getContainerLabTopologyInformation", "getContainerLabDeviceConfiguration", "executeCommandsOnContainerLabDevice", "retrieveKnowledge", "searchKnowledgeFiles", "readKnowledgeFile"]
 
 # Declare available tools (ensure this is in-scope for the chat calls)
 tools_definition = [
@@ -32,8 +32,8 @@ tools_definition = [
     {
         "type": "function",
         "function": {
-            "name": "getTopologyInformation",
-            "description": "Read and return the network topology information from the topology.clab.yaml file converted to JSON format",
+            "name": "getContainerLabTopologyInformation",
+            "description": "Read and return the ContainerLab network topology information from the topology.clab.yaml file converted to JSON format",
             "parameters": {
                 "type": "object",
                 "properties": {},
@@ -43,8 +43,8 @@ tools_definition = [
     {
         "type": "function",
         "function": {
-            "name": "getDeviceConfiguration",
-            "description": "Retrieve the running configuration or network information from a target device via SSH",
+            "name": "getContainerLabDeviceConfiguration",
+            "description": "Retrieve the running configuration or network information from a target device running in the ContainerLab environment via SSH",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -57,7 +57,7 @@ tools_definition = [
     {
         "type": "function",
         "function": {
-            "name": "executeCommandsOnDevice",
+            "name": "executeCommandsOnContainerLabDevice",
             "description": "Execute arbitrary commands on a target device via SSH after user approval",
             "parameters": {
                 "type": "object",
@@ -90,6 +90,40 @@ tools_definition = [
                 "required": ["query"]
             },
         },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "searchKnowledgeFiles",
+            "description": "Full-text keyword search across all text files in the knowledge base (markdown, JSON metadata, text files). Returns a list of files where the keyword was found along with a short snippet. Use this as a fallback when the RAG retrieveKnowledge tool does not return useful results, especially for specific names, identifiers, or niche details that may be buried in image descriptions or side notes.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "keyword": {
+                        "type": "string",
+                        "description": "The keyword or phrase to search for (case-insensitive). E.g. 'Adam Kmet', 'ubuntu2', 'VLAN 100'"
+                    }
+                },
+                "required": ["keyword"]
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "readKnowledgeFile",
+            "description": "Read the full content of a specific file from the knowledge base. Use this after searchKnowledgeFiles finds a relevant file, to load the complete content for detailed analysis.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "Relative path to the file within the knowledge_sources directory, as returned by searchKnowledgeFiles (e.g., 'acmeco/lab_documentation/images/lab_topology.png.meta.json')"
+                    }
+                },
+                "required": ["file_path"]
+            },
+        },
     }
 ]
 
@@ -111,7 +145,7 @@ def getCurrentDateAndTime(fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
     return now.strftime(fmt)
 
 
-def getTopologyInformation(internal_call: bool = False) -> str:
+def getContainerLabTopologyInformation(internal_call: bool = False) -> str:
     """Read the network topology from topology.clab.yaml and ansible-inventory.yml, 
     convert to JSON and merge them.
 
@@ -123,12 +157,12 @@ def getTopologyInformation(internal_call: bool = False) -> str:
         Returns an error message if the files cannot be read or parsed.
 
     Example:
-        >>> topology_json = getTopologyInformation()
+        >>> topology_json = getContainerLabTopologyInformation()
         >>> import json
         >>> data = json.loads(topology_json)
     """
     if not internal_call:
-        print("Tool executed called: getTopologyInformation")
+        print("Tool executed called: getContainerLabTopologyInformation")
     try:
         # Get the directory of the current script
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -170,7 +204,7 @@ def getTopologyInformation(internal_call: bool = False) -> str:
         return json.dumps({"error": error_msg})
 
 
-def getDeviceConfiguration(target: str) -> str:
+def getContainerLabDeviceConfiguration(target: str) -> str:
     """Retrieve the running configuration or network information from a target device via SSH.
 
     Args:
@@ -181,14 +215,14 @@ def getDeviceConfiguration(target: str) -> str:
         Returns an error message if the device cannot be found or accessed.
 
     Example:
-        >>> config_json = getDeviceConfiguration('cisco1')
+        >>> config_json = getContainerLabDeviceConfiguration('cisco1')
         >>> import json
         >>> config = json.loads(config_json)
     """
-    print(f"Tool executed called: getDeviceConfiguration with target = {target}")
+    print(f"Tool executed called: getContainerLabDeviceConfiguration with target = {target}")
     try:
         # Get topology information
-        topology_json = getTopologyInformation(internal_call=True)
+        topology_json = getContainerLabTopologyInformation(internal_call=True)
         topology_data = json.loads(topology_json)
         
         # Search for the target device in the ansible inventory
@@ -303,7 +337,7 @@ def getDeviceConfiguration(target: str) -> str:
         return json.dumps({"error": error_msg})
 
 
-def executeCommandsOnDevice(target: str, commands: str, expected_string: str = None) -> str:
+def executeCommandsOnContainerLabDevice(target: str, commands: str, expected_string: str = None) -> str:
     """Execute arbitrary commands on a target device via SSH after human approval.
 
     Args:
@@ -313,10 +347,10 @@ def executeCommandsOnDevice(target: str, commands: str, expected_string: str = N
     Returns:
         JSON string with the command outputs, or an error message.
     """
-    print(f"Tool executed called: executeCommandsOnDevice target={target}")
+    print(f"Tool executed called: executeCommandsOnContainerLabDevice target={target}")
     try:
         # Get topology and inventory
-        topology_json = getTopologyInformation(internal_call=True)
+        topology_json = getContainerLabTopologyInformation(internal_call=True)
         topology_data = json.loads(topology_json)
         ansible_inventory = topology_data.get("ansible_inventory", {})
         all_children = ansible_inventory.get("all", {}).get("children", {})
@@ -447,6 +481,94 @@ def executeCommandsOnDevice(target: str, commands: str, expected_string: str = N
         error_msg = f"Error executing commands on device: {str(e)}"
         print(f"Error: {error_msg}")
         return json.dumps({"error": error_msg})
+
+
+def searchKnowledgeFiles(keyword: str) -> str:
+    """Full-text keyword search across all text files in the knowledge base.
+
+    Args:
+        keyword: The keyword or phrase to search for (case-insensitive).
+
+    Returns:
+        JSON string with a list of matching files and snippets,
+        or an error message.
+    """
+    print(f"Tool executed called: searchKnowledgeFiles with keyword='{keyword}'")
+    from config import KNOWLEDGE_SOURCES_PATH
+
+    knowledge_dir = os.path.abspath(KNOWLEDGE_SOURCES_PATH)
+    if not os.path.isdir(knowledge_dir):
+        return json.dumps({"error": f"Knowledge sources directory not found: {knowledge_dir}"})
+
+    TEXT_EXTENSIONS = {".md", ".txt", ".json", ".yaml", ".yml", ".cfg", ".conf", ".csv", ".log"}
+    keyword_lower = keyword.lower()
+    results = []
+
+    for root, dirs, files in os.walk(knowledge_dir):
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            if ext not in TEXT_EXTENSIONS:
+                continue
+
+            file_path = os.path.join(root, file)
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+            except Exception:
+                continue
+
+            if keyword_lower not in content.lower():
+                continue
+
+            # Build relative path from knowledge_sources dir
+            rel_path = os.path.relpath(file_path, knowledge_dir).replace("\\", "/")
+
+            # Extract a snippet around the first match
+            idx = content.lower().index(keyword_lower)
+            start = max(0, idx - 80)
+            end = min(len(content), idx + len(keyword) + 80)
+            snippet = content[start:end].replace("\n", " ").strip()
+            if start > 0:
+                snippet = "..." + snippet
+            if end < len(content):
+                snippet = snippet + "..."
+
+            results.append({"file": rel_path, "snippet": snippet})
+
+    if not results:
+        return json.dumps({"message": f"No files found containing '{keyword}'", "results": []})
+
+    return json.dumps({"message": f"Found '{keyword}' in {len(results)} file(s)", "results": results})
+
+
+def readKnowledgeFile(file_path: str) -> str:
+    """Read the full content of a specific file from the knowledge base.
+
+    Args:
+        file_path: Relative path within the knowledge_sources directory.
+
+    Returns:
+        JSON string with the file content, or an error message.
+    """
+    print(f"Tool executed called: readKnowledgeFile with file_path='{file_path}'")
+    from config import KNOWLEDGE_SOURCES_PATH
+
+    knowledge_dir = os.path.abspath(KNOWLEDGE_SOURCES_PATH)
+    full_path = os.path.normpath(os.path.join(knowledge_dir, file_path))
+
+    # Security check: ensure the resolved path is within knowledge_sources
+    if not full_path.startswith(knowledge_dir):
+        return json.dumps({"error": "Access denied: path is outside the knowledge_sources directory"})
+
+    if not os.path.isfile(full_path):
+        return json.dumps({"error": f"File not found: {file_path}"})
+
+    try:
+        with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        return json.dumps({"file": file_path, "content": content})
+    except Exception as e:
+        return json.dumps({"error": f"Error reading file: {str(e)}"})
 
 
 def retrieveKnowledge(query: str, top_k: int = 5) -> str:

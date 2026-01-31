@@ -1,15 +1,156 @@
-# .config.txt - place your real OpenAI API key here and DO NOT commit.
-# Example:
-# OPENAI_API_KEY=sk-...
+"""
+Configuration Template for AI Network Assistant.
+Copy this file to config.py and update the values.
 
-OPENAI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXX
-MODEL="gpt-5-mini"
-MAX_TOKEN_COMPLETITION=2000
-CONFIG_PATH = "config.py"
-DEBUG_MODE = False  # Set to False to disable all debug prints
-KNOWLEDGE_SOURCES_PATH = "./knowledge_sources" 
+Supports both OpenAI public API and local LM Studio.
+"""
+
+import os
+
+# =============================================================================
+# LLM Provider Configuration (Chat & Tools)
+# =============================================================================
+# Provider: "openai" (public API) or "local" (LM Studio)
+# SECURITY: Set to "local" to ensure no data is sent to OpenAI
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "local")
+
+# OpenAI Public API Settings
+# Only used when LLM_PROVIDER="openai"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-your-openai-api-key-here")
+OPENAI_BASE_URL = "https://api.openai.com/v1"
+OPENAI_MODEL = "gpt-4o-mini"
+
+# Local LM Studio Settings
+# Only used when LLM_PROVIDER="local"
+LOCAL_BASE_URL = os.getenv("LOCAL_LLM_URL", "http://192.168.56.1:1234/v1")
+LOCAL_MODEL = os.getenv("LOCAL_MODEL", "deepseek/deepseek-r1-0528-qwen3-8b")
+LOCAL_API_KEY = "lm-studio"  # LM Studio accepts any non-empty string
+
+# Tool Support (disable for models without function calling)
+# Set to "false" for models like Llama that don't support OpenAI tool format
+TOOLS_ENABLED = os.getenv("TOOLS_ENABLED", "true").lower() == "true"
+
+# Max tokens for completions
+MAX_TOKEN_COMPLETITION = 20000
+
+
+def get_llm_config():
+    """Returns the active LLM configuration based on provider selection."""
+    if LLM_PROVIDER == "local":
+        return {
+            "api_key": LOCAL_API_KEY,
+            "base_url": LOCAL_BASE_URL,
+            "model": LOCAL_MODEL,
+        }
+    else:
+        return {
+            "api_key": OPENAI_API_KEY,
+            "base_url": OPENAI_BASE_URL,
+            "model": OPENAI_MODEL,
+        }
+
+
+# =============================================================================
+# RAG / Embedding Configuration
+# =============================================================================
+# Embedding provider: "openai" or "local"
+# WARNING: Changing this requires rebuilding the vector database!
+# SECURITY: Set to "local" to ensure no knowledge data is sent to OpenAI
+EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "local")
+
+# OpenAI Embedding Settings (used when EMBEDDING_PROVIDER="openai")
+OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"
+OPENAI_EMBEDDING_DIMENSIONS = 1536
+
+# Local Embedding Settings (used when EMBEDDING_PROVIDER="local")
+# Requires an embedding model loaded in LM Studio
+# Common models: nomic-embed-text-v1.5 (768 dims), all-MiniLM-L6-v2 (384 dims)
+LOCAL_EMBEDDING_MODEL = os.getenv("LOCAL_EMBEDDING_MODEL", "text-embedding-nomic-embed-text-v1.5")
+LOCAL_EMBEDDING_DIMENSIONS = 768  # Must match the model!
+
+
+def get_embedding_config():
+    """Returns the active embedding configuration based on provider selection."""
+    if EMBEDDING_PROVIDER == "local":
+        return {
+            "provider": "local",
+            "base_url": LOCAL_BASE_URL,
+            "api_key": LOCAL_API_KEY,
+            "model": LOCAL_EMBEDDING_MODEL,
+            "dimensions": LOCAL_EMBEDDING_DIMENSIONS,
+        }
+    else:
+        return {
+            "provider": "openai",
+            "base_url": OPENAI_BASE_URL,
+            "api_key": OPENAI_API_KEY,
+            "model": OPENAI_EMBEDDING_MODEL,
+            "dimensions": OPENAI_EMBEDDING_DIMENSIONS,
+        }
+
+
+# =============================================================================
+# Knowledge Base / Chunking Configuration
+# =============================================================================
+KNOWLEDGE_SOURCES_PATH = r".\knowledge_sources"
+TOP_K_DOCUMENTS = 5  # Number of documents to retrieve in RAG
 
 # Intelligent Markdown Chunking Configuration
-CHUNK_MIN_SIZE = 500  # Minimum chunk size in characters (content must be meaningful)
-CHUNK_IDEAL_SIZE = 3000  # Ideal chunk size in characters (target for smart sizing)
-CHUNK_MAX_SIZE = 8000  # Maximum chunk size in characters (hard limit)
+CHUNK_MIN_SIZE = 0      # Minimum chunk size in characters
+CHUNK_IDEAL_SIZE = 3000 # Ideal chunk size in characters
+CHUNK_MAX_SIZE = 8000   # Maximum chunk size in characters
+
+
+# =============================================================================
+# Image Processing / Vision Configuration
+# =============================================================================
+# Vision provider for image-to-text preprocessing
+# Options: "openai" (GPT-4o) or "local" (LM Studio)
+# SECURITY: Set to "local" to ensure no image data is sent to OpenAI
+VISION_PROVIDER = os.getenv("VISION_PROVIDER", "local")
+
+# OpenAI Vision Settings (used when VISION_PROVIDER="openai")
+OPENAI_VISION_MODEL = "gpt-4o-mini"
+
+# Local Vision Settings (used when VISION_PROVIDER="local")
+# Uses same endpoint as LLM_PROVIDER. Requires a vision-capable model.
+# Common models: LLaVA, devstral-small (with vision support)
+LOCAL_VISION_MODEL = os.getenv("LOCAL_VISION_MODEL", "mistralai/devstral-small-2-2512")
+
+# Image processing settings
+IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"]
+IMAGE_MAX_SIZE_MB = 20  # Skip images larger than this
+IMAGE_DESCRIPTION_MAX_TOKENS = 500
+
+
+def get_vision_config():
+    """Returns the active vision configuration for image processing."""
+    if VISION_PROVIDER == "local":
+        return {
+            "provider": "local",
+            "base_url": LOCAL_BASE_URL,
+            "api_key": LOCAL_API_KEY,
+            "model": LOCAL_VISION_MODEL,
+        }
+    else:
+        return {
+            "provider": "openai",
+            "base_url": OPENAI_BASE_URL,
+            "api_key": OPENAI_API_KEY,
+            "model": OPENAI_VISION_MODEL,
+        }
+
+
+# =============================================================================
+# Rate Limiting Configuration
+# =============================================================================
+RATE_LIMIT_ENABLED = True
+RATE_LIMIT_DELAY_SECONDS = 0.5
+PROGRESS_REPORT_INTERVAL = 100
+
+
+# =============================================================================
+# Debug Configuration
+# =============================================================================
+DEBUG_MODE = False
+

@@ -1,12 +1,12 @@
 
 #!/usr/bin/env python3
 """
-Simple interactive ChatGPT CLI example using the `openai` Python library.
+Simple interactive LLM CLI example using the `openai` Python library.
 
 Usage:
 1. Put your API key in `config.py` as:
    OPENAI_API_KEY="sk-...your key..."
-2. Run: `python chatgpt_cli.py`
+2. Run: `python main.py`
 
 This script reads the key from `.config.txt`, keeps a short conversation
 history, and sends messages to the Chat Completions API.
@@ -18,7 +18,7 @@ from config import MAX_TOKEN_COMPLETITION
 from tools_processing import process_tool_calls
 from helpers import debug_print
 from rag_manager import get_rag_manager
-from openai_client import chat_completion
+from llm_client import chat_completion
 
 def main():
 
@@ -34,7 +34,10 @@ def main():
                 "You are a helpful assistant for network engineering, lab operations and a little bit for administrative tasks. "
                 "You have access to a knowledge base, which contains relevant documentation about our lab and notes about our organization. "
                 "Use the 'retrieveKnowledge' tool whenever you need to reference specific documentation, technical details, or look up configuration examples. "
-                "Only use the knowledge retrieval tool when necessary - avoid overusing it for general knowledge or common networking concepts. \n\n" +
+                "Only use the knowledge retrieval tool when necessary - avoid overusing it for general knowledge or common networking concepts. "
+                "If the 'retrieveKnowledge' RAG search does not return useful results for a specific query (especially for specific names, identifiers, or niche details), "
+                "use 'searchKnowledgeFiles' as a fallback to do a full-text keyword search across all knowledge files including image metadata. "
+                "If searchKnowledgeFiles finds a relevant file, use 'readKnowledgeFile' to load the full content for detailed analysis.\n\n" +
                 "Any conversation or action about lab topology you can ignore the management IPs in the 172.20.20.0/24 range. Dont mention this in responses, it is known." +
                 "During configuration tasks ignore interfaces with IPs in this range, but do not break them as they serve as access for all tools. Dont mention this in responses, it is known." +
                 "Also ignore enp1s0 interfaces on linux devices and ethernet 0/0 on cisco devices as these are management addresses behind a NAT of their management 172.20.20.x IPs. Dont mention this in responses, it is known." +
@@ -52,7 +55,7 @@ def main():
     # message with role `tool` so the assistant can continue.
 
 
-    print("Interactive ChatGPT CLI (type 'exit' or Ctrl-C to quit)")
+    print("Interactive LLM CLI (type 'exit' or Ctrl-C to quit)")
 
     while True:
         try:
@@ -112,7 +115,7 @@ def main():
             # Adding what we recieved to context log:
             messages.append(context)
                          
-            print("\nChatGPT:", assistant_text)
+            print("\nLLM:", assistant_text)
             print("Tokens used: ")
             try:
                 print(" - completion_tokens: ", resp.usage.completion_tokens)

@@ -1,8 +1,12 @@
-# How to Make ChatGPT Access Your Personal Obsidian Notes Using RAG
+# Making AI accessing your personal work notes using RAG mechanism to be your work assistant
 
 Have you ever wished ChatGPT could answer questions about YOUR personal notes? Like "What are my lab credentials?" or "Who do I contact for hardware purchases?" - things only you would know from your private documentation?
 
 In this article, I'll show you how to build a simple RAG (Retrieval-Augmented Generation) system that lets you chat with OpenAI while it seamlessly pulls context from your local Obsidian notes when needed.
+
+NOTE#1 : I was historically using OneNote, but migrating to Obsidian is something you can do using some export/import tools. So this project was my personal motivation to that :)
+
+NOTE#2 : This article uses openai example, but when you download my code from github, you will see in the config.py file, that you can actually point it to a local AI running on LM Studio. This is the way forward if your work notes contain sensitive information you do not want OpenAI to learn about as using public API exposes your work notes to Sam Altman and their cronies to train their AI models on. 
 
 ## What We're Building
 
