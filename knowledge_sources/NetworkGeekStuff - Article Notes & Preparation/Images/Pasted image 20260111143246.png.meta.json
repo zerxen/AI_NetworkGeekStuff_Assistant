@@ -1,0 +1,9 @@
+{
+  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\Pasted image 20260111143246.png",
+  "description": "The image is a table displaying the status of four virtual machines in a network topology simulation. It includes columns for \"Name,\" \"Kind/Image,\" \"State,\" and \"IPv4/6 Address.\" The entries are two Cisco IOL devices (clab-lab_topology-cisco1 and clab-lab_topology-cisco2) with IPv4 addresses 172.20.20.3 and 172.20.20.5, respectively, and two Ubuntu VMs (clab-lab_topology-ubuntu1 and clab-lab_topology-ubuntu2) with IPv4 addresses 172.20.20.4 and 172.20.20.2, respectively. All devices are marked as \"running,\" though the Ubuntu VMs have a health status of \"starting.\" The table also lists corresponding IPv6 addresses for each device.\n\nThis description would help someone searching for information about virtual machine configurations, network topology simulations, or specific IP address assignments in a lab environment.",
+  "generated_at": "2026-01-31T19:28:14.255154Z",
+  "image_mtime": 1768138366.5417187,
+  "model_used": "mistralai/devstral-small-2-2512",
+  "provider": "local",
+  "file_size_bytes": 35058
+}

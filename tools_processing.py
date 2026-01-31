@@ -1,6 +1,6 @@
 import json
 import time
-from tools import getCurrentDateAndTime, getContainerLabTopologyInformation, getContainerLabDeviceConfiguration, executeCommandsOnContainerLabDevice, retrieveKnowledge, tools_definition
+from tools import getCurrentDateAndTime, getContainerLabTopologyInformation, getContainerLabDeviceConfiguration, executeCommandsOnContainerLabDevice, retrieveKnowledge, searchKnowledgeFiles, readKnowledgeFile, tools_definition
 from helpers import debug_print
 from llm_client import chat_completion
 
@@ -115,6 +115,28 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                         debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error retrieving knowledge: {e}"
+                elif name == "searchKnowledgeFiles":
+                    debug_print("DEBUG: Entering tool: searchKnowledgeFiles")
+                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
+                    arguments_object = parse_arguments(arguments_raw)
+                    keyword = arguments_object.get("keyword", "")
+                    debug_print("DEBUG: keyword =", keyword)
+                    try:
+                        tool_result = searchKnowledgeFiles(keyword)
+                        debug_print("DEBUG: Tool result =", tool_result)
+                    except Exception as e:
+                        tool_result = f"Error searching knowledge files: {e}"
+                elif name == "readKnowledgeFile":
+                    debug_print("DEBUG: Entering tool: readKnowledgeFile")
+                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
+                    arguments_object = parse_arguments(arguments_raw)
+                    file_path = arguments_object.get("file_path", "")
+                    debug_print("DEBUG: file_path =", file_path)
+                    try:
+                        tool_result = readKnowledgeFile(file_path)
+                        debug_print("DEBUG: Tool result =", tool_result)
+                    except Exception as e:
+                        tool_result = f"Error reading knowledge file: {e}"
                 else:
                     tool_result = f"Unknown tool: {name}"
 

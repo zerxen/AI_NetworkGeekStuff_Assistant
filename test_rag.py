@@ -35,18 +35,19 @@ def test_rag(clear_db: bool = False):
         
         print("\n2. Testing document retrieval...")
         test_queries = [
-            "cisco lab credentials"
+            "Adam Kmet is owner of any acmeco lab server?"
         ]
         
         for i, query in enumerate(test_queries, 1):
             print(f"\n   Query {i}: '{query}'")
-            context = retrieve_context(query, top_k=2)
+            context = retrieve_context(query, top_k=5)
             
             # Check if we got results
             if "Relevant Knowledge" in context:
                 print(f"   ✓ Retrieved relevant documents")
                 # Print first 300 chars of context
-                print(f"   Preview: {context[:300]}...")
+                #print(f"   Preview: {context[:300]}...")
+                print(f"   Preview: {context}...")
             else:
                 print(f"   ✗ Failed to retrieve documents")
         
