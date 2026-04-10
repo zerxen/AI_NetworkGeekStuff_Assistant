@@ -15,4 +15,4 @@ Is Adam Kmet owner of any lab device?                       ->> should use searc
 How many routers does acmeco lab have?                      ->> confuses containerlab with knowledge_source
 How many routers does acmeco lab have? ignore containerlab  ->> 
 
-
+## Show bogus "cisco best practices" in Obsidian and force LLM to implement
