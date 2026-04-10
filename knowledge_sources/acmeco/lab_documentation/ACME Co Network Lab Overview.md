@@ -7,8 +7,7 @@ The network lab is used for testing configurations, training, and proof-of-conce
 - Badge access required (request from Bob Stevens, Facilities)
 
 ## Lab Network Topology
-![[images\lab_topology.png]]
-
+![[lab_topology.png]]
 ## Device Inventory
 
 | Hostname | Model                        | Management IP | Purpose            |

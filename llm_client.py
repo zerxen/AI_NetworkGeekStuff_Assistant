@@ -65,7 +65,7 @@ class LLMClient:
         kwargs = {
             "model": self.model,
             "messages": messages,
-            "max_tokens": max_tokens,
+            "max_completion_tokens": max_tokens,
         }
 
         # Include tools if enabled and provided

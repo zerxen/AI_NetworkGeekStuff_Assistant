@@ -80,6 +80,16 @@ Verify the knowledge base indexing and retrieval:
 python test_rag.py
 ```
 
+Optionally pass a custom query and control database clearing:
+
+```bash
+# Run with a custom query
+python test_rag.py "Who owns the lab servers?"
+
+# Skip clearing the database (faster, uses existing index)
+python test_rag.py --no-clear "What is the OSPF configuration on cisco1?"
+```
+
 This tests:
 - RAG manager initialization
 - Document chunking from `knowledge_sources/`
