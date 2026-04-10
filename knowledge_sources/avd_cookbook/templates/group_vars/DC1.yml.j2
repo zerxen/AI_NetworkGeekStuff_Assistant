@@ -1,0 +1,12 @@
+---
+# DC-level settings shared by all devices in this data center.
+# This file goes in: group_vars/{{ dc_name }}.yml
+#
+# Variables used:
+#   dc_name       - data center group name, e.g. DC1
+#   mgmt_gateway  - default gateway on the management network
+
+mgmt_gateway: {{ mgmt_gateway }}
+
+management_eapi:
+  enabled: true

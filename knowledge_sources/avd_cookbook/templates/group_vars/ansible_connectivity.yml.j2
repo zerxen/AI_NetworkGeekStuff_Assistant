@@ -1,0 +1,17 @@
+---
+# Ansible connection settings for all EOS devices.
+# This file goes in: group_vars/{{ fabric_name }}.yml alongside FABRIC.yml,
+# OR as a separate file e.g. group_vars/all/ansible.yml
+#
+# Variables used:
+#   ansible_user      - SSH/eAPI username (matches a local_user defined in FABRIC.yml)
+#   ansible_password  - password for that user
+
+ansible_connection: ansible.netcommon.httpapi
+ansible_network_os: arista.eos.eos
+ansible_user: {{ ansible_user }}
+ansible_password: {{ ansible_password }}
+ansible_become: true
+ansible_become_method: enable
+ansible_httpapi_use_ssl: true
+ansible_httpapi_validate_certs: false

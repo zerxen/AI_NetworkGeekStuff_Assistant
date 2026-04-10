@@ -1,0 +1,25 @@
+---
+# Spine node definitions.
+# This file goes in: group_vars/{{ dc_name }}_SPINES.yml
+#
+# Variables used:
+#   dc_name              - data center group name
+#   spine_platform       - EOS platform string, e.g. cEOSLab or 7050CX3
+#   spine_bgp_as         - BGP AS number shared by all spines
+#   spine_loopback_pool  - IPv4 pool for spine loopback0 addresses (e.g. 10.255.0.0/27)
+#   spines               - list of {name, id, mgmt_ip}
+#                          id must be unique per spine, used for IP address calculation
+
+type: spine
+
+spine:
+  defaults:
+    platform: {{ spine_platform }}
+    loopback_ipv4_pool: {{ spine_loopback_pool }}
+    bgp_as: {{ spine_bgp_as }}
+  nodes:
+{% for spine in spines %}
+    - name: {{ spine.name }}
+      id: {{ spine.id }}
+      mgmt_ip: {{ spine.mgmt_ip }}
+{% endfor %}

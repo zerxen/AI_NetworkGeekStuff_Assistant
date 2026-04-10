@@ -1,0 +1,13 @@
+---
+# AVD Deploy Playbook - direct eAPI push.
+# Run with: ansible-playbook playbooks/deploy.yml
+# Requires eAPI access to all devices on their management IPs.
+
+- name: Deploy Configurations to Devices using eAPI
+  hosts: FABRIC
+  gather_facts: false
+  tasks:
+
+    - name: Deploy Configurations to Devices
+      ansible.builtin.import_role:
+        name: arista.avd.eos_config_deploy_eapi

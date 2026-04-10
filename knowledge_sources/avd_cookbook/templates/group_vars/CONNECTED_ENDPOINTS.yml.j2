@@ -1,0 +1,45 @@
+---
+# Connected Endpoints - server/host port profiles and switch port assignments.
+# This file goes in: group_vars/CONNECTED_ENDPOINTS.yml
+#
+# Variables used:
+#   servers  - list of server objects, each with:
+#     name  - server hostname (informational)
+#     adapters  - list of adapter objects, each describing one NIC or bond:
+#       endpoint_ports   - list of NIC port labels on the server side (informational)
+#       switch_ports     - list of switch interface names (one per switch in the switches list)
+#       switches         - list of switch hostnames this adapter connects to
+#       vlans            - VLAN or VLAN range string, e.g. "11-12,21-22" or "11"
+#       mode             - "trunk" or "access"
+#       native_vlan      - (trunk only) native/untagged VLAN ID
+#       spanning_tree_portfast - "edge" for host-facing ports
+#       port_channel     - (optional, for MLAG bonds):
+#         mode           - "active" (LACP)
+#
+# NOTE: For MLAG dual-homed servers:
+#   - switches must list [leafA, leafB] from the same MLAG pair
+#   - switch_ports lists the port on each respective switch (can be the same port name)
+#   - port_channel.mode: active enables LACP
+
+servers:
+{% for server in servers %}
+  - name: {{ server.name }}
+    adapters:
+{% for adapter in server.adapters %}
+      - endpoint_ports: {{ adapter.endpoint_ports | tojson }}
+        switch_ports: {{ adapter.switch_ports | tojson }}
+        switches: {{ adapter.switches | tojson }}
+        vlans: {{ adapter.vlans }}
+        mode: {{ adapter.mode }}
+{% if adapter.native_vlan is defined %}
+        native_vlan: {{ adapter.native_vlan }}
+{% endif %}
+{% if adapter.spanning_tree_portfast is defined %}
+        spanning_tree_portfast: {{ adapter.spanning_tree_portfast }}
+{% endif %}
+{% if adapter.port_channel is defined %}
+        port_channel:
+          mode: {{ adapter.port_channel.mode }}
+{% endif %}
+{% endfor %}
+{% endfor %}

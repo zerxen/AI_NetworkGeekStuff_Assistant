@@ -1,0 +1,32 @@
+---
+# L2 Leaf node definitions.
+# This file goes in: group_vars/{{ dc_name }}_L2_LEAVES.yml
+# OMIT this file entirely if the topology has no L2 leaves.
+#
+# Variables used:
+#   dc_name          - data center group name
+#   l2leaf_platform  - EOS platform string
+#   l2leaf_pairs     - list of L2 leaf groups:
+#                      {group, uplink_switches: [l3leaf_nameA, l3leaf_nameB],
+#                       nodes: [{name, id, mgmt_ip}]}
+#                      uplink_switches must be two nodes from the same L3 MLAG pair.
+#                      id within each group starts at 1.
+
+type: l2leaf
+
+l2leaf:
+  defaults:
+    platform: {{ l2leaf_platform }}
+    spanning_tree_mode: mstp
+
+  node_groups:
+{% for pair in l2leaf_pairs %}
+    - group: {{ pair.group }}
+      uplink_switches: {{ pair.uplink_switches | tojson }}
+      nodes:
+{% for node in pair.nodes %}
+        - name: {{ node.name }}
+          id: {{ node.id }}
+          mgmt_ip: {{ node.mgmt_ip }}
+{% endfor %}
+{% endfor %}

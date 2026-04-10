@@ -1,0 +1,50 @@
+---
+# Network Services - VRFs, SVIs (L3 VLANs), and L2-only VLANs.
+# This file goes in: group_vars/NETWORK_SERVICES.yml
+#
+# Variables used:
+#   tenants  - list of tenant objects, each with:
+#     name              - tenant name string
+#     mac_vrf_vni_base  - base VNI for MAC-VRFs; final VNI = base + vlan_id
+#     vrfs              - list of VRF objects:
+#       name                          - VRF name
+#       vrf_vni                       - VNI for the L3 VRF
+#       vtep_diagnostic_loopback      - loopback number used for VRF diagnostics
+#       vtep_diagnostic_loopback_range - /27 or similar pool for that loopback
+#       svis                          - list of SVI objects:
+#         id                  - VLAN ID (integer)
+#         name                - VLAN/SVI name string
+#         ip_address_virtual  - anycast gateway IP in CIDR notation
+#     l2vlans   - list of L2-only VLANs (no IP gateway):
+#       id    - VLAN ID
+#       name  - VLAN name
+
+tenants:
+{% for tenant in tenants %}
+  - name: {{ tenant.name }}
+    mac_vrf_vni_base: {{ tenant.mac_vrf_vni_base }}
+{% if tenant.vrfs is defined and tenant.vrfs | length > 0 %}
+    vrfs:
+{% for vrf in tenant.vrfs %}
+      - name: {{ vrf.name }}
+        vrf_vni: {{ vrf.vrf_vni }}
+        vtep_diagnostic:
+          loopback: {{ vrf.vtep_diagnostic_loopback }}
+          loopback_ip_range: {{ vrf.vtep_diagnostic_loopback_range }}
+        svis:
+{% for svi in vrf.svis %}
+          - id: {{ svi.id }}
+            name: {{ svi.name }}
+            enabled: true
+            ip_address_virtual: {{ svi.ip_address_virtual }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% if tenant.l2vlans is defined and tenant.l2vlans | length > 0 %}
+    l2vlans:
+{% for vlan in tenant.l2vlans %}
+      - id: {{ vlan.id }}
+        name: {{ vlan.name }}
+{% endfor %}
+{% endif %}
+{% endfor %}

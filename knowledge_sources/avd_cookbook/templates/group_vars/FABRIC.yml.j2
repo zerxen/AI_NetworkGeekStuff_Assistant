@@ -1,0 +1,84 @@
+---
+# AVD Fabric-wide settings
+# This file goes in: group_vars/{{ fabric_name }}.yml
+#
+# Variables used:
+#   fabric_name                  - name of the fabric, e.g. FABRIC
+#   underlay_routing_protocol    - ebgp (recommended for L3LS)
+#   overlay_routing_protocol     - ebgp
+#   p2p_uplinks_mtu              - MTU for P2P links, typically 1500 (cEOS) or 9214 (hardware)
+#   local_users                  - list of {name, privilege, role, no_password?, sha512_password?}
+#   bgp_password_evpn            - BGP password for EVPN overlay peers (encrypted)
+#   bgp_password_underlay        - BGP password for IPv4 underlay peers (encrypted)
+#   bgp_password_mlag            - BGP password for MLAG L3 peer link
+#   dns_server                   - IP address of DNS server
+#   ntp_server                   - NTP server hostname or IP
+#   cv_server                    - CloudVision server IP (omit entire cv_settings block if not used)
+
+fabric_name: {{ fabric_name }}
+
+eos_designs_documentation:
+  topology_csv: true
+  p2p_links_csv: true
+
+underlay_routing_protocol: {{ underlay_routing_protocol }}
+overlay_routing_protocol: {{ overlay_routing_protocol }}
+
+aaa_settings:
+  local_users:
+{% for user in local_users %}
+    - name: {{ user.name }}
+      privilege: {{ user.privilege }}
+      role: {{ user.role }}
+{% if user.no_password is defined and user.no_password %}
+      no_password: true
+{% else %}
+      sha512_password: "{{ user.sha512_password }}"
+{% endif %}
+{% endfor %}
+
+bgp_peer_groups:
+  evpn_overlay_peers:
+    password: {{ bgp_password_evpn }}
+  ipv4_underlay_peers:
+    password: {{ bgp_password_underlay }}
+  mlag_ipv4_underlay_peer:
+    password: {{ bgp_password_mlag }}
+
+p2p_uplinks_mtu: {{ p2p_uplinks_mtu }}
+
+# Default interface assignments per device type.
+# Adjust Ethernet ranges to match the actual port count of your platform.
+default_interfaces:
+  - types: [spine]
+    platforms: [default]
+    uplink_interfaces: [Ethernet1-2]
+    downlink_interfaces: [Ethernet1-8]
+  - types: [l3leaf]
+    platforms: [default]
+    uplink_interfaces: [Ethernet1-2]
+    mlag_interfaces: [Ethernet3-4]
+    downlink_interfaces: [Ethernet8]
+  - types: [l2leaf]
+    platforms: [default]
+    uplink_interfaces: [Ethernet1-2]
+
+dns_settings:
+  servers:
+    - ip_address: {{ dns_server }}
+
+ntp_settings:
+  server_vrf: use_mgmt_interface_vrf
+  servers:
+    - name: {{ ntp_server }}
+
+{% if cv_server is defined %}
+# Remove this block entirely if not using CloudVision
+cv_settings:
+  onprem_clusters:
+    - name: primary
+      servers:
+        - name: {{ cv_server }}
+  terminattr:
+    disable_aaa: true
+{% endif %}

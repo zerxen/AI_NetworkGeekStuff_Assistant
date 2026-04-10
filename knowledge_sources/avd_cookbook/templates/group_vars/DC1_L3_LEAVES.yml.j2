@@ -1,0 +1,49 @@
+---
+# L3 Leaf node definitions (MLAG pairs).
+# This file goes in: group_vars/{{ dc_name }}_L3_LEAVES.yml
+#
+# Variables used:
+#   dc_name                   - data center group name
+#   l3leaf_platform           - EOS platform string
+#   l3leaf_loopback_pool      - IPv4 pool for leaf loopback0 (shared with spine pool, offset applied)
+#   l3leaf_loopback_offset    - offset into pool so leaf loopbacks don't collide with spines
+#                               e.g. if spines use IDs 1-2, set offset to 2
+#   l3leaf_vtep_pool          - IPv4 pool for VTEP (loopback1) addresses
+#   l3leaf_uplink_pool        - IPv4 pool for P2P uplink addresses toward spines
+#   l3leaf_mlag_peer_pool     - IPv4 pool for MLAG peer-link L3 (VLAN4094)
+#   l3leaf_mlag_peer_l3_pool  - IPv4 pool for iBGP between MLAG peers
+#   l3leaf_virtual_router_mac - anycast gateway MAC address (same for all leaves)
+#   l3leaf_spanning_tree_priority - STP priority, 4096 makes leaves root within their VLAN
+#   spine_names               - list of spine node names (uplink_switches for all leaves)
+#   l3leaf_pairs              - list of MLAG pairs:
+#                               {group, bgp_as, nodes: [{name, id, mgmt_ip}]}
+#                               IDs must be globally unique across ALL L3 leaves.
+#                               Pairs sharing a group share one BGP AS.
+
+type: l3leaf
+
+l3leaf:
+  defaults:
+    platform: {{ l3leaf_platform }}
+    loopback_ipv4_pool: {{ l3leaf_loopback_pool }}
+    loopback_ipv4_offset: {{ l3leaf_loopback_offset }}
+    vtep_loopback_ipv4_pool: {{ l3leaf_vtep_pool }}
+    uplink_switches: {{ spine_names | tojson }}
+    uplink_ipv4_pool: {{ l3leaf_uplink_pool }}
+    mlag_peer_ipv4_pool: {{ l3leaf_mlag_peer_pool }}
+    mlag_peer_l3_ipv4_pool: {{ l3leaf_mlag_peer_l3_pool }}
+    virtual_router_mac_address: {{ l3leaf_virtual_router_mac }}
+    spanning_tree_priority: {{ l3leaf_spanning_tree_priority }}
+    spanning_tree_mode: mstp
+
+  node_groups:
+{% for pair in l3leaf_pairs %}
+    - group: {{ pair.group }}
+      bgp_as: {{ pair.bgp_as }}
+      nodes:
+{% for node in pair.nodes %}
+        - name: {{ node.name }}
+          id: {{ node.id }}
+          mgmt_ip: {{ node.mgmt_ip }}
+{% endfor %}
+{% endfor %}

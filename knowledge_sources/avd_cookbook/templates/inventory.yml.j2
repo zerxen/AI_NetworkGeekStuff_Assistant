@@ -1,0 +1,50 @@
+---
+# AVD Ansible Inventory
+# Generated from containerlab topology
+#
+# Variables used:
+#   fabric_name     - top-level fabric group name, e.g. FABRIC
+#   dc_name         - data center group name, e.g. DC1
+#   spines          - list of spine nodes: {name, mgmt_ip}
+#   l3leaf_nodes    - flat list of all L3 leaf nodes: {name, mgmt_ip}
+#   l2leaf_nodes    - flat list of all L2 leaf nodes: {name, mgmt_ip}  (may be empty)
+
+all:
+  children:
+    {{ fabric_name }}:
+      children:
+        {{ dc_name }}:
+          children:
+            {{ dc_name }}_SPINES:
+              hosts:
+{% for spine in spines %}
+                {{ spine.name }}:
+                  ansible_host: {{ spine.mgmt_ip }}
+{% endfor %}
+            {{ dc_name }}_L3_LEAVES:
+              hosts:
+{% for node in l3leaf_nodes %}
+                {{ node.name }}:
+                  ansible_host: {{ node.mgmt_ip }}
+{% endfor %}
+{% if l2leaf_nodes | length > 0 %}
+            {{ dc_name }}_L2_LEAVES:
+              hosts:
+{% for node in l2leaf_nodes %}
+                {{ node.name }}:
+                  ansible_host: {{ node.mgmt_ip }}
+{% endfor %}
+{% endif %}
+
+    NETWORK_SERVICES:
+      children:
+        {{ dc_name }}_L3_LEAVES:
+{% if l2leaf_nodes | length > 0 %}
+        {{ dc_name }}_L2_LEAVES:
+{% endif %}
+    CONNECTED_ENDPOINTS:
+      children:
+        {{ dc_name }}_L3_LEAVES:
+{% if l2leaf_nodes | length > 0 %}
+        {{ dc_name }}_L2_LEAVES:
+{% endif %}
