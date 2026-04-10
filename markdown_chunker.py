@@ -7,7 +7,6 @@ import re
 from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 from pathlib import Path
-import frontmatter
 from helpers import debug_print
 from image_resolver import ImageResolver
 from config import KNOWLEDGE_SOURCES_PATH
@@ -150,13 +149,9 @@ class ObsidianMarkdownChunker:
         if verbose:
             print(f"[CHUNKING] Processing: \"{file_name}\" from directory: \"{directory_path}\"")
         
-        # Parse frontmatter
-        try:
-            fm = frontmatter.loads(content)
-            main_content = fm.content
-        except Exception as e:
-            debug_print(f"WARNING: Could not parse frontmatter for {file_name}: {e}")
-            main_content = content
+        # Strip YAML front matter (--- ... ---) if present
+        match = re.match(r'^---\s*\n.*?\n---\s*\n', content, re.DOTALL)
+        main_content = content[match.end():] if match else content
 
         # Inject image descriptions before chunking
         markdown_path = Path(KNOWLEDGE_SOURCES_PATH) / relative_path

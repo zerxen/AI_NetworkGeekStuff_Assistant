@@ -1,0 +1,70 @@
+<mxfile host="Electron" modified="2024-01-01T00:00:00.000Z" agent="draw.io" version="21.0.0" type="device">
+  <diagram name="lab_topology" id="lab_topology">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ubuntu1 (server) -->
+        <mxCell id="10" value="ubuntu1" style="shape=mxgraph.cisco.servers.standard_server;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="60" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- cisco1 (router) -->
+        <mxCell id="20" value="cisco1" style="shape=mxgraph.cisco.routers.router;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="340" y="300" width="70" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- cisco2 (router) -->
+        <mxCell id="30" value="cisco2" style="shape=mxgraph.cisco.routers.router;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="70" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ubuntu2 (server) -->
+        <mxCell id="40" value="ubuntu2" style="shape=mxgraph.cisco.servers.standard_server;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="300" width="60" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Link: ubuntu1 eth1 <-> cisco1 Ethernet0/2 -->
+        <mxCell id="50" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;strokeWidth=2;" edge="1" source="10" target="20" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Label: ubuntu1 side -->
+        <mxCell id="51" value="eth1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="50">
+          <mxGeometry x="-0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+        <!-- Label: cisco1 side -->
+        <mxCell id="52" value="Eth0/2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="50">
+          <mxGeometry x="0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+
+        <!-- Link: cisco1 Ethernet0/1 <-> cisco2 Ethernet0/1 -->
+        <mxCell id="60" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;strokeWidth=2;" edge="1" source="20" target="30" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Label: cisco1 side -->
+        <mxCell id="61" value="Eth0/1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="60">
+          <mxGeometry x="-0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+        <!-- Label: cisco2 side -->
+        <mxCell id="62" value="Eth0/1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="60">
+          <mxGeometry x="0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+
+        <!-- Link: cisco2 Ethernet0/2 <-> ubuntu2 eth1 -->
+        <mxCell id="70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;strokeWidth=2;" edge="1" source="30" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Label: cisco2 side -->
+        <mxCell id="71" value="Eth0/2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="70">
+          <mxGeometry x="-0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+        <!-- Label: ubuntu2 side -->
+        <mxCell id="72" value="eth1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#AA0000;" vertex="1" connectable="0" parent="70">
+          <mxGeometry x="0.7" relative="1" as="geometry"><Array as="offset"><mxPoint y="-12"/></Array></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

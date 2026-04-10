@@ -1,7 +1,7 @@
 import json
 import time
 from tools import getCurrentDateAndTime, getContainerLabTopologyInformation, getContainerLabDeviceConfiguration, executeCommandsOnContainerLabDevice, retrieveKnowledge, searchKnowledgeFiles, readKnowledgeFile, tools_definition
-from helpers import debug_print
+from helpers import debug_print, tool_call_print, tool_result_print, llm_print, info_print, Colors
 from llm_client import chat_completion
 
 
@@ -58,93 +58,69 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                     debug_print("Failed to parse tool_call entry:", e)
                     continue
 
+                arguments_raw = (function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})) or {}
+                arguments_object = parse_arguments(arguments_raw)
+
                 if name == "getCurrentDateAndTime":
-                    debug_print("DEBUG: Enterigg tool: getCurrentDateAndTime")
-                    #fmt = function_object.get("arguments", "%Y-%m-%d %H:%M:%S") 
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)                    
-                    #arguments_object = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", "%Y-%m-%d %H:%M:%S")
-                    fmt = arguments_object.get("fmt") if isinstance(arguments_object, dict) else getattr(arguments_object, "fmt", "%Y-%m-%d %H:%M:%S")
+                    fmt = arguments_object.get("fmt", "%Y-%m-%d %H:%M:%S")
+                    tool_call_print(name, {"fmt": fmt})
                     try:
                         tool_result = getCurrentDateAndTime(fmt)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
                 elif name == "getContainerLabTopologyInformation":
-                    debug_print("DEBUG: Entering tool: getContainerLabTopologyInformation")
+                    tool_call_print(name, {})
                     try:
                         tool_result = getContainerLabTopologyInformation()
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
                 elif name == "getContainerLabDeviceConfiguration":
-                    debug_print("DEBUG: Entering tool: getContainerLabDeviceConfiguration")
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)
                     target = arguments_object.get("target", None)
-                    debug_print("DEBUG: target =", target)
+                    tool_call_print(name, {"target": target})
                     try:
                         tool_result = getContainerLabDeviceConfiguration(target)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
                 elif name == "executeCommandsOnContainerLabDevice":
-                    debug_print("DEBUG: Entering tool: executeCommandsOnContainerLabDevice")
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)
                     target = arguments_object.get("target", None)
                     commands = arguments_object.get("commands", None)
                     expected_string = arguments_object.get("expected_string", None)
-                    debug_print("DEBUG: target =", target)
-                    debug_print("DEBUG: commands =", commands)
+                    tool_call_print(name, {"target": target, "commands": commands, "expected_string": expected_string})
                     try:
                         tool_result = executeCommandsOnContainerLabDevice(target, commands, expected_string)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error running tool: {e}"
                 elif name == "retrieveKnowledge":
-                    debug_print("DEBUG: Entering tool: retrieveKnowledge")
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)
                     query = arguments_object.get("query", "")
                     top_k = arguments_object.get("top_k", 5)
-                    debug_print("DEBUG: query =", query)
-                    debug_print("DEBUG: top_k =", top_k)
+                    tool_call_print(name, {"query": query, "top_k": top_k})
                     try:
                         tool_result = retrieveKnowledge(query, top_k)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error retrieving knowledge: {e}"
                 elif name == "searchKnowledgeFiles":
-                    debug_print("DEBUG: Entering tool: searchKnowledgeFiles")
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)
                     keyword = arguments_object.get("keyword", "")
-                    debug_print("DEBUG: keyword =", keyword)
+                    tool_call_print(name, {"keyword": keyword})
                     try:
                         tool_result = searchKnowledgeFiles(keyword)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error searching knowledge files: {e}"
                 elif name == "readKnowledgeFile":
-                    debug_print("DEBUG: Entering tool: readKnowledgeFile")
-                    arguments_raw = function_object.get("arguments") if isinstance(function_object, dict) else getattr(function_object, "arguments", {})
-                    arguments_object = parse_arguments(arguments_raw)
                     file_path = arguments_object.get("file_path", "")
-                    debug_print("DEBUG: file_path =", file_path)
+                    tool_call_print(name, {"file_path": file_path})
                     try:
                         tool_result = readKnowledgeFile(file_path)
-                        debug_print("DEBUG: Tool result =", tool_result)
                     except Exception as e:
                         tool_result = f"Error reading knowledge file: {e}"
                 else:
                     tool_result = f"Unknown tool: {name}"
 
+                tool_result_print(name, str(tool_result))
+                debug_print("DEBUG: Full tool result =", tool_result)
+
                 tool_call_id = tc.get("id") if isinstance(tc, dict) else getattr(tc, "id", None)
                 messages.append({"role": "tool", "name": name, "content": tool_result, "tool_call_id": tool_call_id})
-
-                print(".. results of tool call provided to the context")
-                debug_print("   ",messages)            
+                debug_print("   ", messages)            
 
             # Request a follow-up now that all tools executed
             try:
@@ -159,34 +135,34 @@ def process_tool_calls(resp, messages, tools, max_completion_tokens=1024):
                 assistant_msg = {"role": "assistant"}
                 if follow.choices[0].message.content:
                     assistant_msg["content"] = follow.choices[0].message.content.strip()
-                    print("\nLLM (after tools):", assistant_msg["content"])
-                
+                    llm_print(assistant_msg["content"])
+
                 # Check if the follow-up response contains tool_calls
                 follow_tool_calls = getattr(follow.choices[0].message, "tool_calls", None)
                 if follow_tool_calls:
                     assistant_msg["tool_calls"] = follow_tool_calls
-                
+
                 messages.append(assistant_msg)
-                
-                print("Tokens used: ")
-                print(" - completion_tokens: ", follow.usage.completion_tokens)
-                print(" - prompt_tokens: ", follow.usage.prompt_tokens)
-                print(" - total_tokens: ", follow.usage.total_tokens)
-                
+
+                try:
+                    info_print("Tokens:", f"prompt={follow.usage.prompt_tokens}  completion={follow.usage.completion_tokens}  total={follow.usage.total_tokens}")
+                except Exception:
+                    pass
+
                 # If follow-up contains tool calls, process them recursively
                 if follow_tool_calls:
-                    print("Follow-up response contains tool_calls, processing recursively...")
+                    debug_print("Follow-up response contains tool_calls, processing recursively...")
                     messages, tool_processed = process_tool_calls(follow, messages, tools, max_completion_tokens)
                     return messages, tool_processed
                     
             except Exception as e:
-                print("API error during follow-up:", e)
+                print(f"{Colors.RED}API error during follow-up:{Colors.RESET}", e)
                 time.sleep(1)
 
             processed_tool = True
             return messages, True
 
     except Exception as e:
-        print("Tool processing error:", e)
+        print(f"{Colors.RED}Tool processing error:{Colors.RESET}", e)
 
     return messages, processed_tool

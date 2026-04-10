@@ -16,7 +16,7 @@ import time
 from tools import tools_definition
 from config import MAX_TOKEN_COMPLETITION
 from tools_processing import process_tool_calls
-from helpers import debug_print
+from helpers import debug_print, llm_print, info_print, Colors
 from rag_manager import get_rag_manager
 from llm_client import chat_completion
 
@@ -38,7 +38,7 @@ def main():
                 "If the 'retrieveKnowledge' RAG search does not return useful results for a specific query (especially for specific names, identifiers, or niche details), "
                 "use 'searchKnowledgeFiles' as a fallback to do a full-text keyword search across all knowledge files including image metadata. "
                 "If searchKnowledgeFiles finds a relevant file, use 'readKnowledgeFile' to load the full content for detailed analysis.\n\n" +
-                "Any conversation or action about lab topology you can ignore the management IPs in the 172.20.20.0/24 range. Dont mention this in responses, it is known." +
+                "Any conversation or action about lab topology you can ignore the management IPs in the 172.20.20.0/24 range. Dont mention this in responses, it is known. But note that some devices may have default gateway pointed to this network. So use explicite routes in your configuration and troubleshooting to avoid this as potential problem." +
                 "During configuration tasks ignore interfaces with IPs in this range, but do not break them as they serve as access for all tools. Dont mention this in responses, it is known." +
                 "Also ignore enp1s0 interfaces on linux devices and ethernet 0/0 on cisco devices as these are management addresses behind a NAT of their management 172.20.20.x IPs. Dont mention this in responses, it is known." +
                 "If topology map has a link going to eth1 on linux endpoint, on that linux that network card is actually using ens2 as interface name. Dont mention this in responses, it is known."
@@ -59,7 +59,7 @@ def main():
 
     while True:
         try:
-            prompt = input("You: ").strip()
+            prompt = input(f"{Colors.BOLD}{Colors.GREEN}You:{Colors.RESET} ").strip()
         except (EOFError, KeyboardInterrupt):
             print("\nExiting.")
             break
@@ -115,12 +115,9 @@ def main():
             # Adding what we recieved to context log:
             messages.append(context)
                          
-            print("\nLLM:", assistant_text)
-            print("Tokens used: ")
+            llm_print(assistant_text)
             try:
-                print(" - completion_tokens: ", resp.usage.completion_tokens)
-                print(" - prompt_tokens: ", resp.usage.prompt_tokens)
-                print(" - total_tokens: ", resp.usage.total_tokens)
+                info_print("Tokens:", f"prompt={resp.usage.prompt_tokens}  completion={resp.usage.completion_tokens}  total={resp.usage.total_tokens}")
             except Exception:
                 pass
 
@@ -132,7 +129,7 @@ def main():
 
 
         except Exception as e:
-            print("API error:", e)
+            print(f"{Colors.RED}API error:{Colors.RESET}", e)
             time.sleep(1)
 
 

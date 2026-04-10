@@ -10,9 +10,12 @@ import os
 import paramiko
 import re
 from netmiko import ConnectHandler
-from helpers import debug_print
+from helpers import debug_print, Colors
 
 __all__ = ["getCurrentDateAndTime", "getContainerLabTopologyInformation", "getContainerLabDeviceConfiguration", "executeCommandsOnContainerLabDevice", "retrieveKnowledge", "searchKnowledgeFiles", "readKnowledgeFile"]
+
+# When set to True all subsequent executeCommandsOnContainerLabDevice calls skip the approval prompt
+_auto_approve_all = False
 
 # Declare available tools (ensure this is in-scope for the chat calls)
 tools_definition = [
@@ -386,11 +389,19 @@ def executeCommandsOnContainerLabDevice(target: str, commands: str, expected_str
         # Show the commands and request approval
         print("Commands to execute:")
         print(commands)
-        approved = input("approved? [yes/no] ").strip().lower()
-        if approved != "yes":
-            msg = "Execution of these specific commands not approved by user manually, please let's discuss alternatives."
-            print(msg)
-            return json.dumps({"error": msg})
+        global _auto_approve_all
+        if _auto_approve_all:
+            print(f"{Colors.BOLD}{Colors.YELLOW}Auto-approved (all){Colors.RESET}")
+        else:
+            approved = input(f"{Colors.BOLD}{Colors.YELLOW}approved? [yes/no/all]{Colors.RESET} ").strip().lower()
+            if approved == "all":
+                _auto_approve_all = True
+                print(f"{Colors.BOLD}{Colors.YELLOW}All future commands pre-approved for this session.{Colors.RESET}")
+            elif approved != "yes":
+                msg = input(f"{Colors.BOLD}{Colors.GREEN}Your message to LLM:{Colors.RESET} ").strip()
+                if not msg:
+                    msg = "Commands not approved. Please suggest an alternative approach."
+                return json.dumps({"error": msg})
 
         # Normalize commands into a list
         if "\n" in commands:

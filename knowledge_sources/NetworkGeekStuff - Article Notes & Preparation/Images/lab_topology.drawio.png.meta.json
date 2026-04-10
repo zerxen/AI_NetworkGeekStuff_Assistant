@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio.png",
-  "description": "This image depicts a simple network topology diagram featuring four nodes: two Ubuntu servers (`ubuntu1` and `ubuntu2`) and two Cisco routers (`cisco1` and `cisco2`). The diagram shows the IP addressing scheme, with `ubuntu1` assigned `10.10.10.10/24`, `cisco1` using `20.20.20.1/24`, `cisco2` using `30.30.30.2/24`, and `ubuntu2` assigned `30.30.30.30/24`. The connections between devices are labeled with their respective interface numbers (e.g., `10` for `ubuntu1`, `.1` for `cisco1`). No errors or anomalies are visible in the topology.\n\n**Search keywords:** network topology, Cisco routers, Ubuntu servers, IP addressing, simple lab setup.",
-  "generated_at": "2026-01-31T19:28:02.959569Z",
-  "image_mtime": 1767977101.0,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 26791
-}

@@ -1,9 +1,0 @@
-{
-  "image_path": "knowledge_sources\\NetworkGeekStuff - Article Notes & Preparation\\Images\\lab_topology.drawio 1.png",
-  "description": "This image depicts a simple network topology diagram featuring two Ubuntu servers and two Cisco routers connected in series. The Ubuntu hosts, labeled \"ubuntu1\" and \"ubuntu2,\" are connected to the Cisco routers via their respective Ethernet interfaces (eth1). The Cisco routers, named \"cisco1\" and \"cisco2,\" are interconnected using their E0/1 and E0/2 interfaces. The diagram shows IP addressing details for each interface: ubuntu1 has IP 10.10.10.10/24 on eth1, cisco1's E0/2 is 10.10.10.1/24, cisco1's E0/1 is 20.20.20.1/24, cisco2's E0/1 is 20.20.20.2/24, and ubuntu2 has IP 30.30.30.30/24 on eth1. The diagram appears to illustrate a basic routed network setup with sequential routing between the two Ubuntu hosts via the Cisco routers.",
-  "generated_at": "2026-01-31T19:27:40.394154Z",
-  "image_mtime": 1768116816.0,
-  "model_used": "mistralai/devstral-small-2-2512",
-  "provider": "local",
-  "file_size_bytes": 32621
-}
