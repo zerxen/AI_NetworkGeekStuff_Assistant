@@ -12,18 +12,18 @@ Arista AVD (Arista Validated Designs) is an Ansible collection that generates EO
 configurations from a set of structured YAML input files. For a single DC L3LS design the
 required inputs are:
 
-| File | Purpose |
-|---|---|
-| `inventory.yml` | Ansible inventory: groups all devices into spine/leaf/fabric groups |
-| `group_vars/FABRIC.yml` | Fabric-wide settings: routing protocols, BGP passwords, NTP, DNS, users |
-| `group_vars/DC1.yml` | DC-level settings: management gateway, eAPI |
-| `group_vars/DC1_SPINES.yml` | Spine node definitions: IDs, loopbacks, BGP AS |
-| `group_vars/DC1_L3_LEAVES.yml` | L3 leaf MLAG pair definitions: IDs, BGP AS, uplinks, IP pools |
-| `group_vars/DC1_L2_LEAVES.yml` | L2 leaf definitions (optional, omit if none) |
-| `group_vars/NETWORK_SERVICES.yml` | VRFs, SVIs (anycast gateways), L2-only VLANs |
-| `group_vars/CONNECTED_ENDPOINTS.yml` | Server/host port assignments |
-| `playbooks/build.yml` | Ansible playbook to generate configs |
-| `playbooks/deploy.yml` | Ansible playbook to push configs via eAPI |
+| File                                 | Purpose                                                                 |
+| ------------------------------------ | ----------------------------------------------------------------------- |
+| `inventory.yml`                      | Ansible inventory: groups all devices into spine/leaf/fabric groups     |
+| `group_vars/FABRIC.yml`              | Fabric-wide settings: routing protocols, BGP passwords, NTP, DNS, users |
+| `group_vars/DC1.yml`                 | DC-level settings: management gateway, eAPI                             |
+| `group_vars/DC1_SPINES.yml`          | Spine node definitions: IDs, loopbacks, BGP AS                          |
+| `group_vars/DC1_L3_LEAVES.yml`       | L3 leaf MLAG pair definitions: IDs, BGP AS, uplinks, IP pools           |
+| `group_vars/DC1_L2_LEAVES.yml`       | L2 leaf definitions (optional, omit if none)                            |
+| `group_vars/NETWORK_SERVICES.yml`    | VRFs, SVIs (anycast gateways), L2-only VLANs                            |
+| `group_vars/CONNECTED_ENDPOINTS.yml` | Server/host port assignments                                            |
+| `playbooks/build.yml`                | Ansible playbook to generate configs                                    |
+| `playbooks/deploy.yml`               | Ansible playbook to push configs via eAPI                               |
 
 Templates for all of these files are in the `templates/` subdirectory alongside this README.
 Each template is a `.j2` file. The top of every template contains a comment block listing

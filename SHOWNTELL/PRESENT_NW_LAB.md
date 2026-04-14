@@ -1,5 +1,7 @@
 ## DEPLOY / DESTROY containerlab
-ontainerlab redeploy topology.clab.yaml
+containerlab redeploy topology.clab.yaml
+
+containerlab destroy topology.clab.yaml --cleanup
 
 ## First make sure you have access to WSL contianerlab
 route add 172.20.20.0 mask 255.255.255.0 172.27.67.220

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "avd_cookbook/How to construct AVD files from containerlab topology file.md",
+                "file": "acmeco/Cisco configuration best practices.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "How to construct AVD files from containerlab topology file"
+              "title": "Cisco configuration best practices"
             }
           }
         ]
@@ -185,20 +185,24 @@
   },
   "active": "2984d4d7d0a06764",
   "lastOpenFiles": [
+    "acmeco/lab_documentation/images/lab_topology.png",
     "acmeco/Cisco configuration best practices.md",
+    "acmeco/lab_documentation/ACME Co Network Lab Overview.md",
+    "acmeco/contacts/company_contacts.md",
     "avd_cookbook/How to construct AVD files from containerlab topology file.md",
+    "acmeco/Juniper configuration best practices.md",
+    "acmeco/Cisco configuration best practices copy.md",
+    "acmeco/notes/projects_and_tasks.md",
     "acmeco/lab_documentation/Untitled",
     "avd_cookbook/LLM_for_AVD_high_level_workflow.drawio",
     "avd_cookbook/network_architecture.drawio",
     "avd_cookbook/Network_diagram_ICC_Shanghai.drawio",
-    "acmeco/lab_documentation/ACME Co Network Lab Overview.md",
     "avd_cookbook/templates/group_vars/ansible_connectivity.yml.j2",
     "avd_cookbook/templates/playbooks/deploy.yml.j2",
     "avd_cookbook/templates/playbooks/build.yml.j2",
     "avd_cookbook/templates/playbooks",
     "avd_cookbook/templates/group_vars/CONNECTED_ENDPOINTS.yml.j2",
     "avd_cookbook/templates/group_vars/NETWORK_SERVICES.yml.j2",
-    "acmeco/lab_documentation/images/lab_topology.png",
     "acmeco/lab_documentation/Internet PROXY for LAB.md",
     "acmeco/lab_documentation/How we configure boding of linux NICs in LAB.md"
   ]
